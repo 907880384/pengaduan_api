@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Validator;
+use App\User;
 use Auth;
 
 class AuthController extends Controller
@@ -22,7 +23,7 @@ class AuthController extends Controller
             return response(['errors' => $validate->errors()->all], 422);
         }
 
-        if(Auth::attempt(['email' => $req->email, 'password' => $req->password])) {
+        if(Auth::attempt(['username' => $req->username, 'password' => $req->password])) {
             $token = Auth::user()->createToken($this->secreter)->accessToken;
             return response(['token' => $token] ,200);
         }
@@ -42,10 +43,27 @@ class AuthController extends Controller
             return response(['errors' => $validate->errors()->all], 422);
         }
 
+        $user = User::create([
+            'name' => $req->name,
+            'username' => $req->username,
+            'password' => bcrypt($req->password),
+            'remember_token' => Str::random(10),
+        ]);
+
+        if($user) {
+            $token = $user->createToken($this->secreter)->accessToken;
+            return response(['token' => $token], 200);
+        }
+
+        return response(['message' => 'Register new account failed'], 400);
 
     }
 
-    public function logout() {
+    public function logout(Request $req) {
+        if($req->user()->token()->revoke()) {
+            return response(['message' => 'Logout success'], 200);
+        }
         
+        return response(['message' => 'Logout failed'], 400);
     }
 }

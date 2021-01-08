@@ -9,9 +9,9 @@ class RoleSeeder extends Seeder
         return [
             ["name" => "Administrator", "slug" => "admin"],
             ["name" => "Pegawai Negeri", "slug" => "pegawai"],
-            ["name" => "Op. Teknik", "slug" => "teknisi"],
-            ["name" => "Op. Cleaning Service", "slug" => "cleaning-service"],
-            ["name" => "Op. Lainnya", "slug" => "support-center"],
+            ["name" => "Teknisi", "slug" => "teknisi"],
+            ["name" => "Cleaning Service", "slug" => "cleaning-service"],
+            ["name" => "Security", "slug" => "security"],
         ];
     }
     /**
