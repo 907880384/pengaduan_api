@@ -7,7 +7,7 @@ use App\Models\Complaint;
 
 class StatusProcess extends Model
 {
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'slug'];
 
     public function complaints()
     {

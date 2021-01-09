@@ -15,7 +15,8 @@ class CreateStatusProcessesTable extends Migration
     {
         Schema::create('status_processes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->nullable();
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }
