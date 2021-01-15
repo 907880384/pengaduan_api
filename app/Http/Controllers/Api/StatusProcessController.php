@@ -32,7 +32,7 @@ class StatusProcessController extends Controller
         ]);
 
         if($validate->fails()) {
-            return response(['errors' => $validate->errors()->all], 422);
+            return response(['errors' => $validate->errors()->all()], 422);
         }
 
         $result = StatusProcess::create(['name' => $req->name, 'slug' => Str::slug($req->name)]);

@@ -8,11 +8,16 @@ use App\Models\Complaint;
 
 class TypeComplaint extends Model
 {
-    protected $fillable = ['title', 'operational_type_id'];
+    protected $fillable = ['title', 'role_id'];
 
-    public function operationalType()
+    // public function operationalType()
+    // {
+    //     return $this->belongsTo(OperationalType::class, 'operational_type_id', 'id');
+    // }
+
+    public function roleType()
     {
-        return $this->belongsTo(OperationalType::class, 'operational_type_id', 'id');
+        return $this->belongsTo(\App\Models\Role::class, 'role_id', 'id');
     }
 
     public function complaints()

@@ -17,10 +17,9 @@ class CreateComplaintsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('complaint_type_id');
             $table->longText('messages')->nullable()->default(null);
-            $table->unsignedBigInteger('status_process_id')->nullable();
-            $table->longText('thumbnails')->nullable()->default(null);
-            $table->unsignedBigInteger('user_accepted_id')->nullable()->default(null);
-            $table->unsignedBigInteger('approver_id')->nullable()->default(null);
+            $table->boolean('urgent')->nullable()->default(false);
+            $table->boolean('finished')->nullable()->default(false);
+            $table->unsignedBigInteger('user_complaint_id')->nullable()->default(null);
             $table->timestamps();
         });
     }

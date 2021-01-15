@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Validator;
 use App\User;
 use Auth;
 
@@ -14,15 +13,12 @@ class AuthController extends Controller
     public $secreter = 'SECRET_KEY_@SECURE';
 
     public function login(Request $req) {
-        $validate = Validator::make($req->all(), [
+
+        $req->validate([
             'username' => 'required|string|max:50',
             'password' => 'required|string|min:6'
         ]);
-
-        if($validate->fails()) {
-            return response(['errors' => $validate->errors()->all], 422);
-        }
-
+        
         if(Auth::attempt(['username' => $req->username, 'password' => $req->password])) {
             $token = Auth::user()->createToken($this->secreter)->accessToken;
             return response(['token' => $token] ,200);
@@ -33,7 +29,7 @@ class AuthController extends Controller
     }
 
     public function register(Request $req) {
-        $validate = Validator::make($req->all(), [
+        $req->validate([
             'name' => 'required|string|max:100',
             'username' => 'required|string|max:50|unique:users,username',
             'password' => 'required|string|min:6'

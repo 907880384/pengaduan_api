@@ -41,13 +41,9 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function approvedComplaints()
+    public function usersComplaint()
     {
-        return $this->hasMany(\App\Models\Complaint::class, 'approver_id', 'id');
+        return $this->hasMany(\App\Models\Complaint::class, 'user_complaint_id', 'id');
     }
 
-    public function acceptedComplaints()
-    {
-        return $this->hasMany(\App\Models\Complaint::class, 'user_accepted_id', 'id');
-    }
 }
