@@ -8,7 +8,8 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
     Route::post('login', 'AuthController@login');
     Route::post('register', 'AuthController@register');
 
-    Route::get('users', 'UserController@index');
+    Route::group(['middleware' => 'auth:api'], function () {   
+        Route::get('users', 'UserController@index');
         Route::get('logout', 'AuthController@logout');
 
         /** Roles */
@@ -46,13 +47,8 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
             Route::get('/{id}', 'ComplaintController@show');
             Route::post('/store', 'ComplaintController@store');
             Route::delete('/{ct_id}/delete', 'ComplaintController@delete');
-        });
-
-
-    // Route::group(['middleware' => 'auth:api'], function () {   
-        
-
-    // });
+        });    
+    });
 
 });
 

@@ -15,13 +15,14 @@ class AuthController extends Controller
     public function login(Request $req) {
 
         $req->validate([
-            'username' => 'required|string|max:50',
-            'password' => 'required|string|min:6'
+            'username' => 'required|string',
+            'password' => 'required|string'
         ]);
         
         if(Auth::attempt(['username' => $req->username, 'password' => $req->password])) {
             $token = Auth::user()->createToken($this->secreter)->accessToken;
-            return response(['token' => $token] ,200);
+            $user = User::with('roles')->find(Auth::user()->id);
+            return response(['token' => $token, 'user' => $user] ,200);
         }
         else {
             return response(['message' => 'User does not exist'], 400);

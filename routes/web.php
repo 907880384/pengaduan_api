@@ -2,21 +2,32 @@
 
 use Illuminate\Support\Facades\Route;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+Route::get('/', 'Web\AuthController@login');
+Route::get('login', 'Web\AuthController@login')->name('login');
+Route::post('login', 'Web\AuthController@authLogin')->name('login');
 
-Route::get('/', function () {
-    return view('welcome');
+//Auth::routes();
+
+Route::group(['middleware' => ['auth']], function () {
+    Route::get('dashboard', 'Web\DashboardController@index')->name('dashboard');
+    Route::get('logout', 'Web\AuthController@logout')->name('logout');
+
+
+    Route::resource('categories/complaint', 'Web\TypeComplaintController');
+
+    Route::group(['prefix' => 'users'], function () {
+        Route::get('/', 'Web\UsersController@index');
+    });
+
+    Route::group(['prefix' => 'roles'], function () {
+        Route::get('/', 'Web\RolesController@index');
+    });
+
+    Route::group(['prefix' => 'complaints'], function () {
+        Route::get('/', 'Web\ComplaintsController@index');
+    });
+
+    Route::group(['prefix' => 'activities'], function () {
+        Route::get('/', 'Web\ActivitiesController@index');
+    });
 });
-
-Auth::routes();
-
-Route::get('/home', 'HomeController@index')->name('home');

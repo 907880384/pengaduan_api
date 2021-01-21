@@ -1,15 +1,16 @@
-/**
- * First we will load all of this project's JavaScript dependencies which
- * includes React and other helpers. It's a great starting point while
- * building robust, powerful web applications using React + Laravel.
- */
+window.axios = require('axios');
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.Swal = require('sweetalert2');
 
-require('./bootstrap');
+import 'jqvmap/dist/jqvmap.min.css';
+import 'weathericons/css/weather-icons.min.css';
+import 'weathericons/css/weather-icons-wind.min.css';
+import 'summernote/dist/summernote-bs4.css';
 
-/**
- * Next, we will create a fresh React component instance and attach it to
- * the page. Then, you may begin adding components to this application
- * or customize the JavaScript scaffolding to fit your unique needs.
- */
+import 'simpleweather/jquery.simpleWeather';
+import 'chart.js/dist/Chart';
+import 'jqvmap/dist/jquery.vmap';
+import 'jqvmap/dist/maps/jquery.vmap.world';
+import 'summernote/dist/summernote-bs4';
+import 'chocolat/dist/js/jquery.chocolat';
 
-require('./components/Example');

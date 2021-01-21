@@ -13,11 +13,22 @@ class ComplaintController extends Controller
 {
     public function index() {
         $page = 20;
+        $search = request()->query('search');
         $results = Complaint::with([
             'typeComplaint',
             'complainer',
             'complaintTrackings'
-        ])->paginate($page);
+        ]);
+
+        if($search != '') {
+            $results = $results->whereHas('typeComplaint', function($q) use($search) {
+                $q->where('title', 'like', '%'.$search.'%');
+            })->paginate($page);
+        }
+        else {
+            $results = $results->paginate($page);
+        }
+        
         return response($results, 200);
     }
 
