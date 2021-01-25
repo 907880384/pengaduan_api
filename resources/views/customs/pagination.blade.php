@@ -2,9 +2,9 @@
   <div class="row">
     <div class="col-lg-6">
       <p class="p-3 mr-auto">
-        <strong>Halaman : {{ $paginator->currentPage() }}</strong>, &nbsp;
-        <strong>Jumlah Data : {{ $paginator->total() }}</strong>, &nbsp;
-        <strong>Data Per Halaman : {{ $paginator->perPage() }}</strong> 
+        <strong>Page : {{ $paginator->currentPage() }}</strong>, &nbsp;
+        <strong>Total Row : {{ $paginator->total() }}</strong>, &nbsp;
+        <strong>Data Per Page : {{ $paginator->perPage() }}</strong> 
       </p>
     </div>
 

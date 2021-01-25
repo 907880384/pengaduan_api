@@ -6,10 +6,10 @@
     <h1>Master Pengguna</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="#">List Pengguna</a>
+        <a href="{{ url('users') }}">List Pengguna</a>
       </div>
       <div class="breadcrumb-item">
-        <a href="#">Tambah Pengguna</a>
+        <a href="{{ url('users/create') }}">Tambah Pengguna</a>
       </div>
     </div>
   </div>
@@ -41,11 +41,7 @@
                       <td>{{ $row->username }}</td>
                       <td class="text-center">{{ $row->roles()->first()->name }}</td>
                       <td class="text-center">
-                        <button type="button" class="btn btn-primary">
-                          <i class="fas fa-edit"></i> Edit
-                        </button>
-
-                        <button type="button" class="btn btn-danger">
+                        <button type="button" class="btn btn-danger" onclick="deleteRow('{{ $row->id }}')">
                           <i class="fas fa-trash"></i> Delete
                         </button>
                       </td>
@@ -67,3 +63,44 @@
   </div>
 </section>
 @endsection
+
+@push('scripts')
+  <script>
+
+    const urlDestroy = "{!! url('/users') !!}";
+    const urlBackTo = "{!! url('/users') !!}"
+
+    function deleteRow(id) {
+      const url = urlDestroy + "/" + id;
+      Swal.fire({
+        title: 'DELETE ROW',
+        text: 'Anda yakin ingin menghapus data ini ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.delete(url).then((response) => {
+            const {data, status} = response;
+            if(status == 200) {
+              Swal.fire({
+                title: 'SUCCESS',
+                text: data.message,
+                confirmButtonText: `OK`,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = urlBackTo
+                }
+              })
+            }
+          }).catch((error) => {
+            console.log(error.response);
+          });
+        }
+      })
+    }
+
+  </script>
+@endpush

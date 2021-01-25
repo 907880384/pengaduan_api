@@ -12,6 +12,8 @@ class Complaint extends Model
         'urgent',
         'finished',
         'user_complaint_id',
+        'title',
+        'on_assigned'
     ];
 
 
@@ -27,7 +29,11 @@ class Complaint extends Model
 
     public function complaintTrackings()
     {
-        return $this->belongsToMany(\App\Models\Tracking::class, 'complaint_logs', 'complaint_id', 'tracking_id');
+        return $this->belongsToMany(\App\Models\Tracking::class, 'complaint_logs', 'complaint_id', 'tracking_id')->withTimestamps();
     }
     
+    public function assigned()
+    {
+        return $this->hasOne(\App\Models\Assigned, 'complaint_id', 'id');
+    }
 }

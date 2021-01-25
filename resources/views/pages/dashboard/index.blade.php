@@ -1,9 +1,5 @@
 @extends('layouts.backend')
 
-@push('scripts')
-{{-- <script src="{{ asset('assets/js/page/index-0.js') }}"></script> --}}
-@endpush
-
 @section('content')
 <section class="section">
   <div class="section-header">
@@ -73,3 +69,12 @@
   </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+  $(function () {
+    
+
+  });
+</script>
+@endpush

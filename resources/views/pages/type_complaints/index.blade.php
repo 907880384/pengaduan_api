@@ -6,10 +6,10 @@
     <h1>Master Kategori Pengaduan</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="#">Kategori List</a>
+        <a href="{{ url('/categories/complaint') }}">Kategori List</a>
       </div>
       <div class="breadcrumb-item">
-        <a href="#">Tambah Kategori</a>
+        <a href="{{ url('/categories/complaint/create') }}">Tambah Kategori</a>
       </div>
     </div>
   </div>
@@ -38,7 +38,7 @@
                       <td class="text-center">{{ $key + $records->firstItem() }}</td>
                       <td>{{ $row->title }}</td>
                       <td class="text-center">{{ $row->roleType->name }}</td>
-                      <td>
+                      <td class="text-center">
                         <a href="{{ url('categories/complaint/'.$row->id.'/edit') }}" class="btn btn-primary">
                           <i class="fas fa-edit"></i> Edit
                         </a>
@@ -68,9 +68,11 @@
 
 @push('scripts')
   <script>
+    const urlDestroy = "{!! url('/categories/complaint') !!}";
+    const urlBackTo = "{!! url('/categories/complaint') !!}";
 
     function deleteRow(id) {
-      const url = "{!! url('/categories/complaint') !!}/" + id;
+      const url = urlDestroy + "/" + id;
       Swal.fire({
         title: 'DELETE ROW',
         text: 'Anda yakin ingin menghapus data ini ?',
@@ -83,8 +85,6 @@
         /* Read more about isConfirmed, isDenied below */
         if (result.isConfirmed) {
           axios.delete(url).then((response) => {
-
-            console.log(response);
             const {data, status} = response;
             if(status == 200) {
               Swal.fire({
@@ -93,7 +93,7 @@
                 confirmButtonText: `OK`,
               }).then((result) => {
                 if (result.isConfirmed) {
-                  window.location.href = "{!! url('/categories/complaint') !!}"
+                  window.location.href = urlBackTo
                 }
               })
             }

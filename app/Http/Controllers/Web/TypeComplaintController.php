@@ -14,11 +14,6 @@ class TypeComplaintController extends Controller
         return view('pages.type_complaints.index', compact('records'));
     }
 
-    public function show($id)
-    {
-
-    }
-
     public function create()
     {
         $roles = Role::where('id', '!=', 1)->where('id', '!=', 2)->get();
@@ -34,7 +29,21 @@ class TypeComplaintController extends Controller
 
     public function store(Request $req)
     {
+        $req->validate([
+            'title' => 'required|string',
+            'role_id' => 'required'
+        ]);
 
+        $record = TypeComplaint::create([
+            'title' => $req->title, 
+            'role_id' => $req->role_id
+        ]);
+
+        if(!$record) {
+            return response()->json(['message' => 'Failed to created'], 400);
+        }
+
+        return response()->json(['message' => 'Created successfully']);
     }
 
     public function update(Request $req, $id)
@@ -61,6 +70,12 @@ class TypeComplaintController extends Controller
         $result = TypeComplaint::find($id);
         $name = $result->title;
         $result->delete();
-        return response()->json(['message', 'Delete successfully'], 200);
+        return response()->json(["message" => "Delete $name successfully"], 200);
+    }
+
+    public function getTypeByRole($role) {
+        $records = TypeComplaint::where('role_id', '=', $role)->get();
+        return response()->json(['results' => $records], 200);
+        
     }
 }

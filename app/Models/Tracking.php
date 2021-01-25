@@ -11,6 +11,6 @@ class Tracking extends Model
 
     public function trackingComplaints()
     {
-        return $this->belongsToMany(\App\Models\Complaint::class, 'complaint_logs', 'complaint_id', 'tracking_id');
+        return $this->belongsToMany(\App\Models\Complaint::class, 'complaint_logs', 'complaint_id', 'tracking_id')->withTimestamps();
     }
 }

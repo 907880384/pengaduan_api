@@ -4,14 +4,6 @@
 <section class="section">
   <div class="section-header">
     <h1>Master Roles</h1>
-    <div class="section-header-breadcrumb">
-      <div class="breadcrumb-item">
-        <a href="#">List Roles</a>
-      </div>
-      <div class="breadcrumb-item">
-        <a href="#">Tambah Roles</a>
-      </div>
-    </div>
   </div>
 
   <div class="section-body">
@@ -28,7 +20,6 @@
                     <th>#</th>
                     <th>Nama</th>
                     <th>Slug</th>
-                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -38,15 +29,6 @@
                       <td class="text-center">{{ $key + $records->firstItem() }}</td>
                       <td>{{ $row->name }}</td>
                       <td>{{ $row->slug }}</td>
-                      <td class="text-center">
-                        <button type="button" class="btn btn-primary">
-                          <i class="fas fa-edit"></i> Edit
-                        </button>
-
-                        <button type="button" class="btn btn-danger">
-                          <i class="fas fa-trash"></i> Delete
-                        </button>
-                      </td>
                     </tr>
                   @endforeach
                 </tbody>

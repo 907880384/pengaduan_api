@@ -10,14 +10,12 @@ class StatusProcessSeeder extends Seeder
 {
     private function statuses() {
         return collect([
-            'Mulai',
-            'Menunggu',
-            'Sedang Dikerjakan',
-            'Ditunda',
+            'mulai',
+            'dikerjakan',
+            'tunda',
             'Kendala',
-            'Dibatalkan',
-            'Diubah',
-            'Selesai'
+            'batal',
+            'selesai',
         ]);
     } 
 

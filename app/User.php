@@ -20,7 +20,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'name', 'username', 'password',
+        'name', 'username', 'password', 'active'
     ];
 
     /**
@@ -44,6 +44,11 @@ class User extends Authenticatable
     public function usersComplaint()
     {
         return $this->hasMany(\App\Models\Complaint::class, 'user_complaint_id', 'id');
+    }
+
+    public function receiverAssigned()
+    {
+        return $this->hasMany(\App\Models\Assigned, 'user_perform_id', 'id');
     }
 
 }
