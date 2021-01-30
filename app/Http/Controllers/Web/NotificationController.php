@@ -43,4 +43,18 @@ class NotificationController extends Controller
             return abort(404);
         }
     }
+
+    public function readNotificationAssignedWorking($id, $userId)
+    {
+        $user = \App\User::find($userId);
+        $notification = $user->notifications->find($id);
+
+        if($notification) {
+            $notification->markAsRead();
+            return view('pages.notifications.work_complaint', compact('notification'));
+        }
+        else {
+            return abort(404);
+        }
+    }
 }

@@ -9,45 +9,33 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
     Route::post('register', 'AuthController@register');
 
     Route::group(['middleware' => 'auth:api'], function () {   
-        Route::get('users', 'UserController@index');
+        Route::get('users', 'UsersController@index');
         Route::get('logout', 'AuthController@logout');
 
         /** Roles */
-        Route::group(['prefix' => 'roles'], function () {
-            Route::get('/', 'RolesController@index');
-            Route::get('/type/complaint', 'RolesController@getOnlyOperationalsRoles');
-            Route::get('/{role_id}', 'RolesController@show');
-            Route::post('/store', 'RolesController@store');
-            Route::put('/{role_id}/update', 'RolesController@update');
-            Route::delete('/{role_id}/delete', 'RolesController@delete');
-        });
+        Route::resource('roles', 'RolesController')->except(['edit', 'create']);
+        Route::get('roles/type/complaint', 'RolesController@getOnlyOperationalsRoles');
 
         /** Status Process */
-        Route::group(['prefix' => 'status_process'], function () {
-            Route::get('/', 'StatusProcessController@index');
-            Route::get('/{sp_id}', 'StatusProcessController@show');
-            Route::post('/store', 'StatusProcessController@store');
-            Route::put('/{sp_id}/update', 'StatusProcessController@update');
-            Route::delete('/{sp_id}/delete', 'StatusProcessController@delete');
-        });
+        Route::resource('status_process', 'StatusProcessController')->except(['edit', 'create']);
 
         /** Type Of Complaint */
-        Route::group(['prefix' => 'complaint_types'], function () {
-            Route::get('/', 'TypeComplainController@index');
-            Route::get('find/{role_id}', 'TypeComplainController@findByRole');
-            Route::get('/{ct_id}', 'TypeComplainController@show');
-            Route::post('/store', 'TypeComplainController@store');
-            Route::put('/{ct_id}/update', 'TypeComplainController@update');
-            Route::delete('/{ct_id}/delete', 'TypeComplainController@delete');
-        });
+        Route::resource('complaint_types', 'TypeComplainController')->except(['edit', 'create']);
+        Route::get('complaint_types/find/{role_id}', 'TypeComplainController@findByRole');
 
         /** Complaint */
-        Route::group(['prefix' => 'complaints'], function () {
-            Route::get('/', 'ComplaintController@index');
-            Route::get('/{id}', 'ComplaintController@show');
-            Route::post('/store', 'ComplaintController@store');
-            Route::delete('/{ct_id}/delete', 'ComplaintController@delete');
-        });    
+        Route::resource('complaints', 'ComplaintsController')->except(['edit', 'create']);
+        Route::post('assigned/complaints', 'ComplaintsController@assignComplaint');
+        
+        Route::group(['prefix' => 'information'], function () {
+            Route::get('/complaints', 'InformationController@getComplaintInfo');
+        });
+
+
+        /** Read Notification Mobile */
+        Route::group(['prefix' => 'mobile_notifications'], function () {
+            Route::get('/get/read/{id}', 'MobileNotificationController@getAndReadNotification');
+        });
     });
 
 });

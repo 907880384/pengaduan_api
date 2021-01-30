@@ -34,6 +34,6 @@ class Complaint extends Model
     
     public function assigned()
     {
-        return $this->hasOne(\App\Models\Assigned, 'complaint_id', 'id');
+        return $this->hasOne(\App\Models\Assigned::class, 'complaint_id', 'id');
     }
 }

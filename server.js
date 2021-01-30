@@ -11,7 +11,8 @@ var ioRedis = require('ioredis');
 var redis = new ioRedis(redisPort, redisHost);
 var listChannel = {
   complaintChannel: 'complaint-channel',
-  assignedComplaintChannel: 'assign-complaint'
+  assignedComplaintChannel: 'assign-complaint',
+  assignedWorkingComplaintChannel: 'assign-working-complaint'
 }
 var sourceData = {
   users: [],
@@ -23,6 +24,10 @@ redis.subscribe(listChannel.complaintChannel, () => {
 
 redis.subscribe(listChannel.assignedComplaintChannel, () => {
   console.log(`Now you subscribe channel ${listChannel.assignedComplaintChannel}`);
+});
+
+redis.subscribe(listChannel.assignedWorkingComplaintChannel, () => {
+  console.log(`Now you subscribe channel ${listChannel.assignedWorkingComplaintChannel}`);
 });
 
 
@@ -38,7 +43,7 @@ io.on("connection", function (socket) {
     sourceData.users[userId] = socket.id;
     io.emit("sendDataUserActiveLogin", sourceData.users);
   });
-
+  
   socket.on("disconnect", function () {
     var i = sourceData.users.indexOf(socket.id);
     sourceData.users.splice(i, 1, 0);
@@ -47,6 +52,10 @@ io.on("connection", function (socket) {
 });
 
 
+// server.listen(serverPort, '192.168.43.168',() => {
+//   console.log(`Socket server is running on port ${serverPort}`);
+// });
+
 server.listen(serverPort, () => {
-  console.log(`Socket server is running on port ${serverPort}`);
+  console.log(`Socket server is running on port ${serverPort}`)
 });

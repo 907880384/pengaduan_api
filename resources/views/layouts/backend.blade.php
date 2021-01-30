@@ -42,11 +42,16 @@
         assignedComplaint: {
           channelName: 'assign-complaint',
           eventName: 'App\\Events\\AssignedComplaintEvent'
+        },
+        assignedWorkingComplaint: {
+          channelName: 'assign-working-complaint',
+          eventName: 'App\\Events\\AssignedWorkingComplaintEvent'
         }
       },
       notification:{
         complaint: "App\\Notifications\\NotifikasiComplaint",
-        assignedComplaint: "App\\Notifications\\AssignedNotif"
+        assignedComplaint: "App\\Notifications\\AssignedNotif",
+        assignedWorkComplaint: "App\\Notifications\\AssignedWorkingComplaint"
       }
     }
 
@@ -54,7 +59,7 @@
 
     function loadNotification(user_id) {
       $.get('/notification/get/by/' + user_id, (data) => {
-        console.log(data);
+        console.log("Result Get Notification Data", data);
         setNotification(data, "#notifications")
       });
     }
@@ -69,7 +74,7 @@
     function showNotification(data, target)
     { 
       if(data.length) {
-        const url = "{{  url('/notification/all/') }}/" + data.notifiable_id
+        const url = "{{  url('/notification/all') }}"
         var htmlElements = data.map(function (notification) {
           return makeNotification(notification);
         });
@@ -106,6 +111,10 @@
         to = to + '/assigned/' + data.id + '/user/' + data.notifiable_id;
       }
 
+      if(data.type === globalBroadcast.notification.assignedWorkComplaint) {
+        to = to + '/assigned/working/complaint/' + data.id + '/user/' + data.notifiable_id;
+      }
+
       return to;
     }
 
@@ -128,8 +137,14 @@
     $(function () { 
       
       let authUser   = @json(auth()->user());
+      //Local
       let socketIP   = "127.0.0.1";
       let socketPORT = "8005";
+
+      //Internet
+      // let socketIP   = "192.168.43.168" //"127.0.0.1";
+      // let socketPORT = "8005";
+
       let socket = io(socketIP + ":" + socketPORT);
 
       console.log("AUTH USER", authUser)
@@ -144,23 +159,28 @@
         console.log("Now Data Receive", data);
       });
 
+    
       socket.on(globalBroadcast.event.complaint.channelName + ":" + globalBroadcast.event.complaint.eventName, (message) => {
-        console.log(message);
-        const {complaint, receiverId} = message;
-        if(authUser.id == receiverId) {
-          loadNotification(receiverId);
+        console.log(`${globalBroadcast.event.complaint.channelName}`, message);
+        if(authUser.id == message.receiveData) {
+          loadNotification(message.receiveData);
         }
       });
 
       socket.on(globalBroadcast.event.assignedComplaint.channelName + ":" + globalBroadcast.event.assignedComplaint.eventName, (message) => {
         console.log(message);
-        const {complaint, receiveAssigned} = message;
-        console.lo
-        if(authUser.id == receiveAssigned) {
-          loadNotification(receiveAssigned);
+        if(authUser.id == message.receiveData) {
+          loadNotification(message.receiveData);
         }
       });
-
+      
+      socket.on(globalBroadcast.event.assignedWorkingComplaint.channelName + ":" + globalBroadcast.event.assignedWorkingComplaint.eventName, (message) => {
+        console.log(message);       
+        const filters = message.receiveData.filter((item) => item == authUser.id);
+        if(filters.length > 0) {
+          loadNotification(filters[0]);
+        }
+      });
     });
   </script>
   @stack('scripts')

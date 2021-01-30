@@ -20,7 +20,7 @@ class CreateAssignedsTable extends Migration
             $table->boolean('is_working')->nullable()->default(false);
             $table->longText('image_work')->nullable()->default(null);
             $table->longText('description')->nullable()->default(null);
-            $table->dateTime('start_work')->nullable()->default(\Carbon\Carbon::now()->toDateTimeString());
+            $table->dateTime('start_work')->nullable()->default(null);
             $table->dateTime('end_work')->nullable()->default(null);
             $table->unsignedBigInteger('status_id')->default(null);
             $table->timestamps();

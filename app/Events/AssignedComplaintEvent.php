@@ -14,17 +14,19 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 class AssignedComplaintEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
-    public $assigned;
-    public $receiveAssigned;
+    public $data;
+    public $receiveData;
+    public $mobileNotif;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($assigned, $receiveAssigned)
+    public function __construct($data, $receiveData, $mobileNotif)
     {
-        $this->assigned = $assigned;
-        $this->receiveAssigned = $receiveAssigned;
+        $this->data = $data;
+        $this->receiveData = $receiveData;
+        $this->mobileNotif = $mobileNotif;
     }
 
     /**
@@ -40,8 +42,9 @@ class AssignedComplaintEvent implements ShouldBroadcastNow
     public function broadcastWith()
     {
       return [
-        'assigned' => $this->assigned,    
-        'receiveAssigned' => $this->receiveAssigned,
+        'data' => $this->data,    
+        'receiveData' => $this->receiveData,
+        'mobileNotif' => $this->mobileNotif,
       ];
     }
 }

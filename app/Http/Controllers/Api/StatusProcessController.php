@@ -12,7 +12,8 @@ use Helper;
 class StatusProcessController extends Controller
 {
     public function index() {
-        $results = StatusProcess::paginate(5);
+        $page = 10;
+        $results = StatusProcess::paginate($page);
         return $results;
     }
 
@@ -62,7 +63,7 @@ class StatusProcessController extends Controller
         return response(['message' => Helper::defaultMessage('Status Process')->UPDATE_SUCCESS], 200);
     }
 
-    public function delete($id) {
+    public function destroy($id) {
         $result = StatusProcess::find($id);
         $name = $result->name;
 

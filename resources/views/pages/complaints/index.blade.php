@@ -96,7 +96,7 @@
 
                         @if (auth()->user()->roles()->first()->slug === 'admin')
                           @if (!$row->on_assigned && !$row->finished)
-                          <button class="badge badge-primary" onclick="showAssignModal('{{ $row }}')">
+                          <button class="badge badge-primary" onclick="showAssignModal('{{ $row->id }}', '{{ $row->typeComplaint->role_id }}')">
                             <i class="fas fa-tag"></i> Assign
                           </button>
                           @endif
@@ -190,14 +190,13 @@
       }
     }
 
-    function showAssignModal(row) {
-      row = JSON.parse(row);
+    function showAssignModal(id, role_id) {
+      console.log("ID", id);
+      console.log("ROLE ID", role_id);
       $("#modalAssign").modal('show');
-      $("#buttonAssign").attr('data-id', row.id);
+      $("#buttonAssign").attr('data-id', id);
 
-      console.log(row.type_complaint);
-
-      axios.get(urlUsers + '/' + row.type_complaint.role_id).then((response) => {
+      axios.get(urlUsers + '/' + role_id).then((response) => {
         console.log(response);
         if(response.status === 200) {
           const {users} = response.data;

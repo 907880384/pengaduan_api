@@ -11,23 +11,22 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class ComplaintsEvent implements ShouldBroadcastNow
+class AssignedWorkingComplaintEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $data;
     public $receiveData;
-    public $mobileNotif;
-
+    public $messageNotif;
     /**
      * Create a new event instance.
      *
      * @return void
      */
-    public function __construct($data, $receiveData, $mobileNotif)
+    public function __construct($data, $receiveData, $msg = '')
     {
         $this->data = $data;
         $this->receiveData = $receiveData;
-        $this->mobileNotif = $mobileNotif;
+        $this->messageNotif = $msg;
     }
 
     /**
@@ -37,7 +36,7 @@ class ComplaintsEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('complaint-channel');
+        return new Channel('assign-working-complaint');
     }
 
     public function broadcastWith()
@@ -45,7 +44,7 @@ class ComplaintsEvent implements ShouldBroadcastNow
       return [
         'data' => $this->data,    
         'receiveData' => $this->receiveData,
-        'mobileNotif' => $this->mobileNotif
+        'messageNotif' => $this->messageNotif,
       ];
     }
 }

@@ -67,7 +67,7 @@ class TypeComplainController extends Controller
         return response(['message' => Helper::defaultMessage('Complaint Type')->UPDATE_SUCCESS], 200);
     }
 
-    public function delete($id) {
+    public function destroy($id) {
         $result = TypeComplaint::find($id);
         $name = $result->title;
 

@@ -63,7 +63,7 @@ class RolesController extends Controller
         return response(['message' => Helper::defaultMessage('Role')->UPDATE_SUCCESS], 200);
     }
 
-    public function delete($id) {
+    public function destroy($id) {
         $result = Role::find($id);
         $name = $result->name;
 

@@ -2,6 +2,11 @@
 
 namespace App\Helpers;
 
+use App\Notifications\NotifikasiComplaint as NotificationComplaint;
+use App\Notifications\AssignedNotif as NotificationAssignedComplaint;
+use App\Notifications\AssignedWorkingComplaint as NotificationAssignedWorkingComplaint;
+use Notification;
+
 class Helper {
     
     public static function defaultMessage($msg='') {
@@ -13,5 +18,28 @@ class Helper {
             "DELETE_SUCCESS" => $msg == '' ? "Delete Successfully" : "$msg Delete Successfully"
         ];
     }
+
+    public static function setNotification($type, $receive, $result)
+    {
+        switch ($type) {
+            case 'ASSIGNED_COMPLAINT':
+                $user = \App\User::find($receive);
+                Notification::send($user, new NotificationAssignedComplaint($result));
+                break;
+            
+            case 'CREATE_COMPLAINT':
+                $user = \App\User::find($receive);
+                Notification::send($user, new NotificationComplaint($result));
+                break;
+
+            case 'START_WORKING_ASSIGNED':
+                $user = \App\User::whereIn('id', $receive)->get();
+                Notification::send($user, new NotificationAssignedWorkingComplaint($result));
+            default:
+                break;
+        }
+    }
+
+    
 
 }
