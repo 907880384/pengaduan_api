@@ -14,28 +14,25 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
 
         /** Roles */
         Route::resource('roles', 'RolesController')->except(['edit', 'create']);
-        Route::get('roles/type/complaint', 'RolesController@getOnlyOperationalsRoles');
+        Route::get('operational/roles', 'RolesController@getOperationalRoles');
 
         /** Status Process */
         Route::resource('status_process', 'StatusProcessController')->except(['edit', 'create']);
 
-        /** Type Of Complaint */
-        Route::resource('complaint_types', 'TypeComplainController')->except(['edit', 'create']);
-        Route::get('complaint_types/find/{role_id}', 'TypeComplainController@findByRole');
-
         /** Complaint */
         Route::resource('complaints', 'ComplaintsController')->except(['edit', 'create']);
         Route::post('assigned/complaints', 'ComplaintsController@assignComplaint');
+        Route::get('accept/assigned/{assignedId}/complaints', 'ComplaintsController@startWorkComplaint');
         
-        Route::group(['prefix' => 'information'], function () {
-            Route::get('/complaints', 'InformationController@getComplaintInfo');
-        });
-
-
+        
         /** Read Notification Mobile */
         Route::group(['prefix' => 'mobile_notifications'], function () {
-            Route::get('/get/read/{id}', 'MobileNotificationController@getAndReadNotification');
+            Route::get('/show/all', 'MobileNotificationController@showAll');
+            Route::get('/read/{notifId}', 'MobileNotificationController@readById');
         });
+
+        Route::get('/information/complaints', 'InformationController@getComplaintInfo');
+
     });
 
 });

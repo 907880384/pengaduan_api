@@ -9,15 +9,24 @@ use Notification;
 
 class Helper {
     
-    public static function defaultMessage($msg='') {
+    public static function messageResponse() {
         return (object) [
-            "FOUND_ERROR" => "Oppss. your search not found",
-            "CREATE_FAILED" => $msg == '' ? "Create Fail" : "$msg Create Fail",
-            "CREATE_SUCCESS" => $msg == '' ? "Create Successfully" : "$msg Create Successfully",
-            "UPDATE_SUCCESS" => $msg == '' ? "Update Successfully" : "$msg Update Successfully",
-            "DELETE_SUCCESS" => $msg == '' ? "Delete Successfully" : "$msg Delete Successfully"
+            'NOT_ACCESSED' => 'Mohon maaf anda tidak dapat mengakses perintah ini',
+            'COMPLAINT_NOT_FOUND' => 'Informasi pengaduan yang anda cari tidak ditemukan',
+            'COMPLAINT_DELETE_SUCCESS' => 'Data pengaduan berhasil di hapus',
+            'COMPLAINT_DELETE_FAIL' => 'Data pengaduan gagal di hapus',
+            'COMPLAINT_CREATE_SUCCESS' => 'Data pengaduan baru berhasil ditambahkan',
+            'COMPLAINT_CREATE_FAIL' => 'Data pengaduan baru gagal disimpan',
+            'COMPLAINT_BEFORE_ASSIGNED' => 'Data pengaduan sudah pernah disetujui',
+            'COMPLAINT_ASSIGNED' => 'Data pengaduan berhasil disetujui admin',
+            'COMPLAINT_ASSIGNED_FAIL' => 'Data pengaduan gagal disetujui',
+            'COMPLAINT_WORK_ACCEPTED_FAIL' => 'Permintaan pelaksanaan penggaduan ditolak',
+            'COMPLAINT_WORK_ACCEPTED' => 'Permintaan pelaksanaan penggaduan diterima',
+            'NOTIFICATION_ADD_FAIL' => 'Info notifikasi gagal ditambahkan',
+            'NOTIFICATION_NOT_FOUND' => 'Info notifikasi tidak ditemukan',
         ];
     }
+
 
     public static function setNotification($type, $receive, $result)
     {

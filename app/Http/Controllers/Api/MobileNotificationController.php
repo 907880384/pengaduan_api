@@ -12,28 +12,44 @@ use Auth;
 
 class MobileNotificationController extends Controller
 {
-    public function getAndReadNotification($id) {
-        $notifs = MobileNotification::find($id);
+    private $page = 10;
 
-        if(!$notifs) {
-            return response(['message' => 'Notification not found'], 404);
-        }
-
-        $notifs->read_at = \Carbon\Carbon::now();
-        $notifs->save();
-
-        if(!$notifs) {
-            return response(['message' => 'Notification cannot be read'], 400);
-        }
-
-        if($notifs->type == 'ASSIGNED_COMPLAINT') {
-            $data = json_decode($notifs->data, true);
-            $assigned = Assigned::with(['user', 'complaint', 'status'])->find($data['data']['id']);
-            $notifs->assigned = $assigned;
-        }
-
-        return response(['notifs' => $notifs], 200);
+    private function sendResponse($msg, $status=200) {
+        return response(['message' => $msg], $status);
     }
 
+    public function showAll()
+    {
+        if(Auth::user()) {
+            $is_read = request()->query('is_read');
+            $records = MobileNotification::where('receiver_id', Auth::user()->id);
+            
+            if(isset($is_read) && $is_read === 'false') {
+                $records = $records->where('read_at', '=', null);
+            }
+            else {
+                $records = $records->where('read_at', '!=', null);
+            }
+            $records = $records->orderBy('updated_at', 'desc')->paginate($this->page);
+            return response($records);
+        }
+
+        return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);    
+    }
+
+    public function readById($id) {
+        $record = MobileNotification::find($id);
+
+        if(!$record) {
+            return $this->sendResponse(Helper::messageResponse()->NOTIFICATION_NOT_FOUND, 404);
+        }
+
+        if($record->read_at == null) {
+            $record->read_at = \Carbon\Carbon::now();
+            $record->save();
+        }
+
+        return response(['result' => $record]);
+    }
     
 }

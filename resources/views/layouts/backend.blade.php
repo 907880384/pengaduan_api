@@ -33,6 +33,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 
   <script>
+    var urlNotif = "{{ url('mobile_notification') }}"
     window.globalBroadcast = {
       event: {
         complaint: {
@@ -58,9 +59,9 @@
     var notifications = [];
 
     function loadNotification(user_id) {
-      $.get('/notification/get/by/' + user_id, (data) => {
+      $.get(`${urlNotif}/find/${user_id}/limit`, (data) => {
         console.log("Result Get Notification Data", data);
-        setNotification(data, "#notifications")
+        setNotification(data.result, "#notifications")
       });
     }
 
@@ -74,10 +75,12 @@
     function showNotification(data, target)
     { 
       if(data.length) {
-        const url = "{{  url('/notification/all') }}"
+        const url = urlNotif + '/show';
+
         var htmlElements = data.map(function (notification) {
           return makeNotification(notification);
         });
+        
         $(target).addClass('beep');
         $(target + 'Menu').html(htmlElements.join(''));
         $(target + 'Footer').html('<a href="' + url + '">View All<i class="fas fa-chevron-right"></i></a>')
@@ -101,20 +104,8 @@
     }
 
     function routeNotification(data) {
-      var to = 'notification/read';
-
-      if(data.type === globalBroadcast.notification.complaint) {
-        to = to + '/complaint/' + data.id + '/user/' + data.notifiable_id          
-      }
-
-      if(data.type === globalBroadcast.notification.assignedComplaint) {
-        to = to + '/assigned/' + data.id + '/user/' + data.notifiable_id;
-      }
-
-      if(data.type === globalBroadcast.notification.assignedWorkComplaint) {
-        to = to + '/assigned/working/complaint/' + data.id + '/user/' + data.notifiable_id;
-      }
-
+      var to = ''
+      to += urlNotif + '/read/' + data.id;
       return to;
     }
 
@@ -126,7 +117,7 @@
       text += '</div>';
 
       text += '<div class="dropdown-item-desc">';
-        text += data.data.message;
+        text += data.messages;
         text += '<div class="text-info">';
           text += moment(data.created_at).fromNow()
         text += '</div>';
@@ -138,12 +129,16 @@
       
       let authUser   = @json(auth()->user());
       //Local
-      let socketIP   = "127.0.0.1";
-      let socketPORT = "8005";
+      // let socketIP   = "127.0.0.1";
+      // let socketPORT = "8005";
+
+      //Wifi Bobo
+      // let socketIP = "192.168.1.15";
+      // let socketPORT = "8005";
 
       //Internet
-      // let socketIP   = "192.168.43.168" //"127.0.0.1";
-      // let socketPORT = "8005";
+      let socketIP   = "192.168.43.168" //"127.0.0.1";
+      let socketPORT = "8005";
 
       let socket = io(socketIP + ":" + socketPORT);
 

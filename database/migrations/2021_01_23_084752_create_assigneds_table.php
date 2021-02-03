@@ -16,8 +16,8 @@ class CreateAssignedsTable extends Migration
         Schema::create('assigneds', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('complaint_id');
-            $table->unsignedBigInteger('user_perform_id');
-            $table->boolean('is_working')->nullable()->default(false);
+            $table->unsignedBigInteger('executor_id');
+            $table->boolean('is_accepted')->nullable()->default(false);
             $table->longText('image_work')->nullable()->default(null);
             $table->longText('description')->nullable()->default(null);
             $table->dateTime('start_work')->nullable()->default(null);

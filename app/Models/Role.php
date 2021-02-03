@@ -22,8 +22,8 @@ class Role extends Model
         return $this->belongsToMany(User::class, 'users_roles');
     }
 
-    public function typeComplaints()
+    public function complaints()
     {
-        return $this->hasMany(\App\Models\TypeComplaint::class, 'role_id', 'id');
+        return $this->hasMany(\App\Models\Complaint::class, 'type_id', 'id');
     }
 }

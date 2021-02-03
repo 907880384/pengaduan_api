@@ -15,8 +15,6 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class, 
             UserSeeder::class,
             StatusProcessSeeder::class,
-            OperationalTypeSeeder::class,
-            TypeComplaintSeeder::class
         ]);
     }
 }

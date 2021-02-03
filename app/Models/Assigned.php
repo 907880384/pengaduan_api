@@ -8,8 +8,8 @@ class Assigned extends Model
 {
     protected $fillable = [
         'complaint_id',
-        'user_perform_id',
-        'is_working',
+        'executor_id',
+        'is_accepted',
         'image_work',
         'description',
         'start_work',
@@ -17,9 +17,9 @@ class Assigned extends Model
         'status_id'
     ];
 
-    public function user()
+    public function executor()
     {
-        return $this->belongsTo(\App\User::class, 'user_perform_id', 'id');
+        return $this->belongsTo(\App\User::class, 'executor_id', 'id');
     }
 
     public function complaint()

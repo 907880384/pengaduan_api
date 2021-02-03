@@ -15,7 +15,7 @@ class RolesController extends Controller
         return response($results, 200);
     }
 
-    public function getOnlyOperationalsRoles() {
+    public function getOperationalRoles() {
         $results = Role::where('slug', '!=', 'admin')->where('slug', '!=', 'pegawai')->get();
         return response($results, 200);
     }

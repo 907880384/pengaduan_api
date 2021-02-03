@@ -13,13 +13,13 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('logout', 'Web\AuthController@logout')->name('logout');
 
     /** Notification */
-    Route::get('notification/get/by/{user}', 'Web\NotificationController@getNotifications');
+    // Route::get('notification/get/by/{user}', 'Web\NotificationController@getNotifications');
 
-    Route::get('notification/read/complaint/{id}/user/{userId}', 'Web\NotificationController@readNotificationComplaint');
+    // Route::get('notification/read/complaint/{id}/user/{userId}', 'Web\NotificationController@readNotificationComplaint');
 
-    Route::get('notification/read/assigned/{id}/user/{userId}', 'Web\NotificationController@readNotificationAssigned');
+    // Route::get('notification/read/assigned/{id}/user/{userId}', 'Web\NotificationController@readNotificationAssigned');
 
-    Route::get('notification/read/assigned/working/complaint/{id}/user/{userId}', 'Web\NotificationController@readNotificationAssignedWorking');
+    // Route::get('notification/read/assigned/working/complaint/{id}/user/{userId}', 'Web\NotificationController@readNotificationAssignedWorking');
 
 
     /** Type Complaint */
@@ -36,7 +36,7 @@ Route::group(['middleware' => ['auth']], function () {
     /** Complaints */
     Route::resource('complaints', 'Web\ComplaintsController');
     Route::post('assigned/complaints', 'Web\ComplaintsController@assignComplaint');
-    Route::get('start/working/complaint/{assignedId}', 'Web\ComplaintsController@startWorkComplaint');
+    Route::get('accept/assigned/{assignedId}/complaints', 'Web\ComplaintsController@startWorkComplaint');
     Route::get('show/finished/working/complaint/{complaint}', 'Web\ComplaintsController@showFinished');
     Route::post('finish/working/complaint', 'Web\ComplaintsController@finishWorkComplaint');
 
@@ -44,6 +44,12 @@ Route::group(['middleware' => ['auth']], function () {
     /** Activities */
     Route::group(['prefix' => 'activities'], function () {
         Route::get('/', 'Web\ActivitiesController@index');
+    });
+
+    Route::group(['prefix' => 'mobile_notification'], function () {
+        Route::get('/find/{receiver}/limit', 'Web\MobileNotificationController@findLimit');
+        Route::get('/show', 'Web\MobileNotificationController@show');
+        Route::get('/read/{notifId}', 'Web\MobileNotificationController@read');
     });
 
 

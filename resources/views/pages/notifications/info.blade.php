@@ -3,12 +3,11 @@
 @section('content')
 <section class="section">
   <div class="section-header">
-    <h1>Notifikasi Penugasan Pengaduan</h1>
+    <h1>Baca Notifikasi</h1>
   </div>
 
 
   <div class="section-body">
-    <h2 class="section-title">Baca Notifikasi</h2>
 
     <div class="row">
       <div class="col-12 col-sm-12 col-lg-12">
@@ -18,18 +17,20 @@
               <div class="author-box-name">
                 <h5 class="text-primary">
                   <strong>
-                    {{ $notification->data['message'] }}
+                    Pesan Pemberitahuan
                   </strong>
                 </h5>
               </div>
 
-              <div class="author-box-job">
-                <small>
-                  <i>
+              <div class="author-box-description">
+                <p>{{ $notification->messages }}</p>
+                <div class="text-black-50">
+                  <small>
                     {{ \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $notification->created_at)->format('d F Y, H:m:s') }}
-                  </i>
-                </small>
+                  </small>
+                </div>
               </div>
+
             </div>
 
           </div>

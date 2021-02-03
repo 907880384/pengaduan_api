@@ -16,7 +16,7 @@ class CreateComplaintLogsTable extends Migration
         Schema::create('complaint_logs', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('complaint_id')->nullable();
-            $table->unsignedBigInteger('tracking_id')->nullable();
+            $table->text('log')->nullable()->default(null);
             $table->timestamps();
         });
     }

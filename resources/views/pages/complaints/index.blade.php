@@ -13,7 +13,6 @@
     </div>
   </div>
 
-
   <div class="section-body">
     <h2 class="section-title">List Data Pengaduan</h2>
     <div class="row">
@@ -26,12 +25,13 @@
                 <thead>
                   <tr class="text-center">
                     <th>#</th>
-                    <th>Kategori</th>
-                    <th>Pesan</th>
-                    <th>Mode</th>
-                    <th>Status</th>
-                    <th>Assign</th>
+                    <th>Perihal/Judul</th>
+                    <th>Pesan Pengaduan</th>
+                    <th>Penting (Urgent)</th>
+                    <th>Selesai (Finish)</th>
+                    <th>Penugasan (Assigned)</th>
                     <th>Pengirim Pesan</th>
+                    <th>Pelaksana</th>
                     <th>Waktu Pengiriman</th>
                     <th>Action</th>
                   </tr>
@@ -41,62 +41,64 @@
                   @foreach ($records as $key => $row)
                     <tr>
                       <td class="text-center">{{ $key + $records->firstItem() }}</td>
-                      <td class="text-center">{{ $row->typeComplaint->title }}</td>
+                      <td class="text-center">{{ $row->title }}</td>
                       <td>{{ $row->messages }}</td>
+                      {{-- Urgent --}}
                       <td class="text-center">
-                        @if ($row->urgent)
+                        @if ($row->is_urgent)
                           <div class="badge badge-danger">
-                            <i class="fas fa-bomb"></i> urgent
+                            PENTING
                           </div>
                         @else 
                           <div class="badge badge-info">
-                            <i class="fas fa-circle"></i> normal
+                            BIASA
                           </div>
                         @endif
                       </td>
+                      {{-- Selesai --}}
                       <td class="text-center">
-                        @if ($row->finished)
-                          <div class="badge badge-success">
-                            <i class="fas fa-check-circle"></i> finish
-                          </div>
-                          
+                        @if ($row->is_finished)
+                          <div class="badge badge-primary">
+                          SELESAI
+                          </div> 
                         @else
                         <div class="badge badge-secondary">
-                          <i class="fas fa-pause-circle"></i> on progress
+                          BELUM SELESAI
                         </div>
                         @endif
                       </td>
+                      {{-- Penugasan --}}
                       <td class="text-center">
-                        @if ($row->finished)
+                        @if ($row->is_assigned)
                           <div class="badge badge-success">
-                            Assigned and Finished
+                            DITUGASKAN
                           </div>
                         @else
-                          @if ($row->on_assigned)
-                            <div class="badge badge-primary">
-                              <i class="fas fa-handshake"></i> assigned
-                            </div>
-                          @else
                           <div class="badge badge-warning">
-                            <i class="fas fa-power-off"></i> not assigned
+                            MENUNGGU DITUGASKAN
                           </div>
-                          @endif
                         @endif
                       </td>
-
-                      <td class="text-center">{{ $row->complainer->name }}</td>
-                      <td class="text-center">{{ $row->updated_at }}</td>
+                      <td class="text-center">{{ $row->sender->name }}</td>
+                      <td class="text-center">
+                        @if ($row->executor)
+                          <b>{{ $row->executor->name }}</b>
+                        @else
+                          &nbsp;
+                        @endif
+                      </td>
+                      <td class="text-center">{{ $row->created_at }}</td>
 
                       <td class="text-center">
-                        @if ($row->finished)
+                        @if ($row->is_finished)
                         <a href="#" class="badge badge-info">
                           <i class="fas fa-eye"></i> Detail
                         </a>
                         @endif
 
                         @if (auth()->user()->roles()->first()->slug === 'admin')
-                          @if (!$row->on_assigned && !$row->finished)
-                          <button class="badge badge-primary" onclick="showAssignModal('{{ $row->id }}', '{{ $row->typeComplaint->role_id }}')">
+                          @if (!$row->is_assigned && !$row->is_finished)
+                          <button class="badge badge-primary" onclick="showAssignModal('{{ $row->id }}', '{{ $row->type_id }}')">
                             <i class="fas fa-tag"></i> Assign
                           </button>
                           @endif
@@ -131,18 +133,18 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-12 col-12">
+          <div class="col-lg-12">
             <form>
               <div class="form-group row">
-                <label for="selectAssign" class="col-form-label col-md-4">
+                <label for="selectAssign" class="col-form-label col-lg-4">
                   Assigned To
                 </label>
-                <div class="col-md-8">
+                <div class="col-lg-8">
                   <select class="form-control" id="selectAssign"></select>
                 </div>
               </div>
               <div class="form-group row">
-                <div class="offset-md-4 col-md-8">
+                <div class="offset-lg-4 col-lg-8">
                   <button id="buttonAssign" class="btn btn-primary" data-id="">
                     Apply & Assign
                   </button>
@@ -191,8 +193,6 @@
     }
 
     function showAssignModal(id, role_id) {
-      console.log("ID", id);
-      console.log("ROLE ID", role_id);
       $("#modalAssign").modal('show');
       $("#buttonAssign").attr('data-id', id);
 
@@ -212,8 +212,8 @@
       $("#buttonAssign").click(function (e) { 
         e.preventDefault();
         const data = {
-          id: $(this).attr('data-id'),
-          user_perform_id: $("#selectAssign").val()
+          complaint_id: $(this).attr('data-id'),
+          executor_id: $("#selectAssign").val()
         }
         console.log(data);
         

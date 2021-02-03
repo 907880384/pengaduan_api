@@ -65,7 +65,7 @@ class UsersController extends Controller
     {
         $users = User::with('roles')->whereHas('roles', function($q) use($roleId) {
             $q->where('role_id', '=', $roleId); 
-        })->where('active', '=', false)->get();
+        })->get();
         
         if($users) {
             return response()->json(['users' => $users], 200);

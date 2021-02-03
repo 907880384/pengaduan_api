@@ -12,21 +12,35 @@ class ActivitiesController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $slug = strtolower($user->roles()->first()->slug);
-        $records = Complaint::with(['typeComplaint', 'complainer', 'complaintTrackings', 'assigned']);
 
-        if($slug == 'pegawai') {
-            $records = $records->where('user_complaint_id', $user->id);
+        if(!$user) {
+            return abort(404);
         }
 
-        if($slug !== 'pegawai' && $slug !== 'admin') {
+        $slug = strtolower($user->roles()->first()->slug);
+        
+        $records = Complaint::with(['sender', 'assigned', 'logs']);
+
+
+        if($slug === 'pegawai') {
+            $records = $records->where('sender_id', $user->id);
+        }
+
+        if($slug != 'admin' && $slug != 'pegawai') {
             $records = $records->whereHas('assigned', function($q) use($user) {
-                $q->where('user_perform_id', $user->id);
+                $q->where('executor_id', $user->id);
             });
         }
 
-        $records = $records->where('on_assigned', '=', true)->orderBy('updated_at', 'desc')->paginate(10); 
+        $records = $records->where('is_assigned', '=', true)->orderBy('updated_at', 'desc')->paginate(10); 
 
+        $records->getCollection()->transform(function($query) {
+            if($query->assigned != null) {
+                $query->executor = \App\User::find($query->assigned->executor_id);
+            }
+            return $query;
+        }); 
+         
         return view('pages.activities.index', compact('records'));
     }
 }

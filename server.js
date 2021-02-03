@@ -51,11 +51,15 @@ io.on("connection", function (socket) {
   });
 });
 
+//
+server.listen(serverPort, '192.168.43.168',() => {
+  console.log(`Socket server is running on port ${serverPort}`);
+});
 
-// server.listen(serverPort, '192.168.43.168',() => {
-//   console.log(`Socket server is running on port ${serverPort}`);
+// server.listen(serverPort, () => {
+//   console.log(`Socket server is running on port ${serverPort}`)
 // });
 
-server.listen(serverPort, () => {
-  console.log(`Socket server is running on port ${serverPort}`)
-});
+// server.listen(serverPort, '192.168.1.15', () => {
+//   console.log(`Socket server is running on port ${serverPort}`)
+// });

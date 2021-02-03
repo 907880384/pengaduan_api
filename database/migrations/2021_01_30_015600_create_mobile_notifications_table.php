@@ -17,6 +17,7 @@ class CreateMobileNotificationsTable extends Migration
             $table->id();
             $table->string('type')->nullable()->default(null);
             $table->unsignedBigInteger('receiver_id');
+            $table->text('messages')->nullable()->default(null);
             $table->longText('data')->nullable()->default(null);
             $table->timestamp('read_at')->nullable();
             $table->timestamps();

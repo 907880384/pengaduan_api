@@ -8,6 +8,12 @@ class ComplaintLog extends Model
 {
     protected $fillable = [
         'complaint_id',
-        'tracking_id',
+        'log',
     ];
+
+    public function complaint()
+    {
+        return $this->belongsTo(\App\Models\Complaint::class, 'complaint_id', 'id');
+    }
 }
+

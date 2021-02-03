@@ -17,24 +17,72 @@ use Helper;
 
 class ComplaintsController extends Controller
 {
+    private $page = 10;
+
+    private function sendResponse($msg, $status=200) {
+        return response()->json(['message' => $msg], $status);
+    }
+
     public function index()
     {
         $user = Auth::user();
-        $slug = strtolower($user->roles()->first()->slug);
-        $records = Complaint::with(['typeComplaint', 'complainer', 'complaintTrackings']);
 
-        if($slug !== 'pegawai' && $slug !== 'admin') {
-            $records = $records->whereHas('typeComplaint', function($q) use($user) {
-                $q->where('role_id', $user->roles()->first()->id);
-            })->where('on_assigned', '=' ,true);
+        if(!$user) {
+            return abort(404);
         }
-        else {
-            if($slug === 'pegawai') {
-                $records = $records->where('user_complaint_id', '=', $user->id);
+
+        $sentences = request()->query('sentences');
+        $search = request()->query('search');
+        $slug = strtolower($user->roles()->first()->slug);
+
+        $records = Complaint::with(['sender', 'assigned', 'logs']);
+
+        if($sentences) {
+            switch ($sentences) {
+                case 'not_assigned':
+                    $records = $records->where('is_assigned',  false);
+                    break;
+                case 'assigned':
+                    $records = $records->where('is_assigned', true);
+                    break;
+                case 'accepted':
+                    $records = $records->where('is_assigned', '=', true)->whereHas('assigned', function($q){
+                        $q->where('is_accepted', true);
+                    })->where('is_finished', '=', false);
+                    break;
+                case 'finished':
+                    $records = $records->where('is_assigned', true)->where('is_finished', true);
+                    break;
+                default:
+                    $records = $records;
+                    break;
             }
         }
 
-        $records = $records->where('on_assigned', '=', false)->orderBy('updated_at', 'desc')->paginate(10);       
+        if($slug === 'pegawai') {
+            $records = $records->where('sender_id', $user->id);
+        }
+        
+        if($slug != 'admin' && $slug != 'pegawai') {
+            $records = $records->whereHas('assigned', function($q) use($user) {
+                $q->where('executor_id', $user->id);
+            });
+        }
+
+        if($search && $search != '') {
+            $records = $records->where('title', 'like', '%'.$search.'%');
+        }
+
+        $records = $records->orderBy('updated_at', 'desc')->paginate($this->page);
+
+        $records->getCollection()->transform(function($query) {
+            if($query->assigned != null) {
+                $query->executor = \App\User::find($query->assigned->executor_id);
+            }
+            return $query;
+        });     
+        
+        
         return view('pages.complaints.index', compact('records'));
     }
 
@@ -43,212 +91,176 @@ class ComplaintsController extends Controller
         return view('pages.complaints.create', compact('roles'));
     }
 
-    public function store(Request $req) 
-    {
-
-        $slug = strtolower(Auth::user()->roles()->first()->slug);
-
-        if ($slug == 'pegawai') {
-
-            $req->validate([
-                'complaint_type_id' => 'required',
-                'messages' => 'required|string',
-                'urgent' => 'required',
-            ]);
-
-            $complaint = Complaint::create([
-                'complaint_type_id' => $req->complaint_type_id,
-                'messages' => $req->messages,
-                'urgent' => $req->urgent,
-                'user_complaint_id' => Auth::user()->id,
-            ]);
-
-            if(!$complaint) {
-                return response(['message' => Helper::defaultMessage('Complaint')->CREATE_FAILED], 400);
-            }
-
-            $type = 'CREATE_COMPLAINT';
-            $results = [
-                'message' => User::find($complaint->user_complaint_id)->name . ' menambahkan pengaduan baru',
-                'data' => $complaint,
-                'receiveData' => 1
-            ];
-
-            $mobileNotif = MobileNotification::create([
-                'type' => $type,
-                'receiver_id' => 1,
-                'data' => json_encode($results, true),
-            ]);
-
-            event(new ComplaintsEvent($complaint, 1, $mobileNotif));
-
-            Helper::setNotification($type, 1, $results);
-
-            return response(['message' => Helper::defaultMessage('Complaint')->CREATE_SUCCESS], 200);
-        }
-
-        return response(['message' => 'Sorry. You can not access this route'], 400); 
-    }
-
     public function show($id)
     {
-        $result = Complaint::with([
-            'typeComplaint',
-            'complainer',
-            'complaintTrackings',
-        ])->find($id);
+        $record = Complaint::with(['sender', 'assigned', 'logs'])->find($id);
 
-        if(!$result) {
-            return response(['message' => Helper::defaultMessage()->FOUND_ERROR,], 404);    
+        if(!$record) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_NOT_FOUND, 404);    
         }
 
-        return response(['result' => $result], 200); 
+
+        return response(['result' => $record], 200);
     }
 
     public function destroy($id)
     {
-        $result = Complaint::find($id);
+        $record = Complaint::find($id);
 
         if(Auth::user()->roles()->first()->slug === 'admin') {
-            $result->delete();
-            return response(["message" => Helper::defaultMessage()->DELETE_SUCCESS], 200);
+            $record->delete();
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_DELETE_SUCCESS, 200);
         }
 
-        return response(['message' => 'Sorry. You can not access this route'], 400);
+        return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         
+    }
+
+    public function store(Request $req) 
+    {
+        $slug = strtolower(
+            Auth::user()->roles()->first()->slug
+        );
+
+        if($slug != 'pegawai') {
+            return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
+        }
+
+        $req->validate([
+            'title' => 'required|string',
+            'messages' => 'required',
+            'is_urgent' => 'required',
+            'type_id' => 'required',
+        ]);
+
+        $complaint = Complaint::create([
+            'title' => $req->title,
+            'messages' => $req->messages,
+            'is_urgent' => $req->is_urgent,
+            'sender_id' => Auth::user()->id,
+            'type_id' => $req->type_id
+        ]);
+
+        if(!$complaint) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_CREATE_FAIL, 400);
+        }
+
+        $notification = MobileNotification::create([
+            'type' => 'CREATE_NEW_COMPLAINT',
+            'receiver_id' => 1,
+            'messages' => Auth::user()->name . ' menambahkan pengaduan baru',
+            'data' => json_encode($complaint, true),
+        ]);
+
+        if(!$notification) {
+            return $this->sendResponse(Helper::messageResponse()->NOTIFICATION_ADD_FAIL);
+        }
+
+        event(new ComplaintsEvent($complaint, 1, $notification));
+
+        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_CREATE_SUCCESS);
     }
 
     public function assignComplaint(Request $req) 
     {   
-        $slug = strtolower(Auth::user()->roles()->first()->slug);
-        
-        if($slug === 'admin') {
-            $req->validate([
-                'id' => 'required',
-                'user_perform_id' => 'required'
-            ]);
-            
-    
-            $complaint = Complaint::find($req->id);
-            $complaint->on_assigned = true;
-            $complaint->save();
-    
-            if(!$complaint) {
-                return response()->json(['message' => 'Pengaduan tidak dapat di assign'], 400);
-            }
-    
-            $assigned = Assigned::create([
-                'complaint_id' => $complaint->id,
-                'user_perform_id' => $req->user_perform_id,
-                'status_id' => \App\Models\StatusProcess::where('slug', '=', 'mulai')->first()->id
-            ]);
-    
-            if(!$assigned) {
-                return response()->json(['message' => 'Assigned ditolak'], 400);
-            }
-            
-            $user = \App\User::find($req->user_perform_id);
-            $user->active = true;
-            $user->save();
-    
-            $type = 'ASSIGNED_COMPLAINT';
-            $results = [
-                'message' => "Pengaduan ". $complaint->typeComplaint->title . " telah ditugaskan (assigned)",
-                'data' => $assigned,
-                'receiveData' => $req->user_perform_id
-            ];
+        $slug = strtolower(
+            Auth::user()->roles()->first()->slug
+        );
 
-            //Set mobile notification
-            $mobileNotif = MobileNotification::create([
-                'type' => $type,
-                'receiver_id' => $req->user_perform_id,
-                'data' => json_encode($results, true),
-            ]);
-
-            //Set Complaint Event
-            event(new AssignedComplaintEvent($assigned, $req->user_perform_id, $mobileNotif));
-            
-            //Set Notification
-            Helper::setNotification($type, $req->user_perform_id, $results);
-    
-            return response([
-                "message" => 'Assigned Complaint Success'
-            ], 200);
+        if($slug !== 'admin') {
+            return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
-        return response([
-            'message' => 'Sorry. You can not access this route'
-        ], 400);
+        $req->validate([
+            'complaint_id' => 'required',
+            'executor_id' => 'required'
+        ]);
+
+        $complaint = Complaint::with(['sender', 'assigned', 'logs', 'types'])->find($req->complaint_id);
+
+        if(!$complaint) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_NOT_FOUND, 404);
+        }
+
+        if($complaint->is_assigned == true) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_BEFORE_ASSIGNED, 400);
+        }
+
+        $complaint->is_assigned = true;
+        $complaint->save();
+
+        if(!$complaint) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_ASSIGNED_FAIL, 400);
+        }
+
+        $assigned = Assigned::create([
+            'complaint_id' => $req->complaint_id,
+            'executor_id' => $req->executor_id,
+            'status_id' => \App\Models\StatusProcess::where('slug', '=', 'mulai')->first()->id
+        ]);
+
+        if(!$assigned) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_ASSIGNED_FAIL, 400);
+        }
+
+        $mobileNotif = MobileNotification::create([
+            'type' => 'COMPLAINT_ASSIGNED',
+            'receiver_id' => $req->executor_id,
+            'messages' => 'Informasi Pengaduan '.$complaint->title. ' telah ditugaskan',
+            'data' => json_encode($complaint, true),
+        ]);
+
+        event(new AssignedComplaintEvent($assigned, $req->executor_id, $mobileNotif));
+    
+        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_ASSIGNED);
     }
 
     public function startWorkComplaint($assignedId)
     {
         $slug = strtolower(Auth::user()->roles()->first()->slug);
 
-        if($slug !== 'admin' && $slug !== 'pegawai') 
-        {
-            $user = Auth::user();
-            
-            $assigned = Assigned::find($assignedId);
-            $assigned->is_working = true;
-            $assigned->start_work = \Carbon\Carbon::now()->toDateTimeString();
-            $assigned->status_id = \App\Models\StatusProcess::where('slug', '=', 'dikerjakan')->first()->id;
-            $assigned->save();
-
-            if(!$assigned) {
-                return response()->json(['message' => 'Pengaduan gagal diterima'], 400);
-            }
-            
-            $complaint = Complaint::with([
-                'typeComplaint', 'complainer', 'complaintTrackings', 'assigned'
-            ])->where('id', $assigned->complaint_id)->first();
-
-            //Set mobile notification
-            $type = 'START_WORKING_ASSIGNED';
-            $results = [
-                'message' => $user->name. " Menerima dan melaksanakan Pengaduan ",
-                'data' => $complaint,
-                'receiveData' => [$complaint->user_complaint_id, 1]
-            ];
-
-            $mobileNotif = MobileNotification::insert([
-                [
-                    'type' => $type,
-                    'receiver_id' => 1,
-                    'data' => json_encode($results, true),
-                    'created_at' => \Carbon\Carbon::now(),
-                    'updated_at' => \Carbon\Carbon::now(),
-                ],
-                [
-                    'type' => $type,
-                    'receiver_id' => $complaint->user_complaint_id,
-                    'data' => json_encode($results, true),
-                    'created_at' => \Carbon\Carbon::now(),
-                    'updated_at' => \Carbon\Carbon::now(),
-                ]
-            ]);
-
-            event(new AssignedWorkingComplaintEvent(
-                $complaint, 
-                [$complaint->user_complaint_id, 1],
-                $mobileNotif
-            ));
-
-            //setNotification
-            Helper::setNotification(
-                'START_WORKING_ASSIGNED', 
-                [$complaint->user_complaint_id, 1], 
-                $results
-            );
-
-            return response()->json([
-                "message" => "Complaint Accepted To Work"
-            ], 200);
+        if($slug === 'admin' || $slug === 'pegawai') {
+            return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
-        
-        return response([
-            'message' => 'Sorry. You can not access this route'
-        ], 400);
+
+        $assigned = Assigned::with(['complaint'])->find($assignedId);
+        $assigned->is_accepted = true;
+        $assigned->start_work = \Carbon\Carbon::now()->toDateTimeString();
+        $assigned->status_id = \App\Models\StatusProcess::where('slug', '=', 'dikerjakan')->first()->id;
+        $assigned->save();
+
+        if(!$assigned) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_WORK_ACCEPTED_FAIL, 400);
+        }
+
+        $complaint = Complaint::with(['sender', 'assigned', 'logs', 'types'])->find($assigned->complaint_id);
+
+        $mobileNotif = MobileNotification::insert([
+            [
+                'type' => 'COMPLAINT_WORK_ACCEPTED',
+                'receiver_id' => $complaint->sender_id,
+                'messages' => Auth::user()->name. " Menerima dan melaksanakan pekerjaan sesuai pengaduan",
+                'data' => json_encode($complaint, true),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ],
+            [
+                'type' => 'COMPLAINT_WORK_ACCEPTED',
+                'receiver_id' => 1,
+                'messages' => Auth::user()->name. " Menerima dan melaksanakan pekerjaan sesuai pengaduan",
+                'data' => json_encode($complaint, true),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]
+        ]);
+
+        event(new AssignedWorkingComplaintEvent(
+            $complaint, 
+            [$complaint->sender_id, 1],
+            $mobileNotif
+        ));
+
+        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_WORK_ACCEPTED);
     }
 
     public function showFinished($id) 

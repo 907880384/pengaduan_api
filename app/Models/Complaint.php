@@ -7,33 +7,33 @@ use Illuminate\Database\Eloquent\Model;
 class Complaint extends Model
 {
     protected $fillable = [
-        'complaint_type_id',
-        'messages',
-        'urgent',
-        'finished',
-        'user_complaint_id',
         'title',
-        'on_assigned'
+        'messages',
+        'is_urgent',
+        'is_finished',
+        'is_assigned',
+        'sender_id',
+        'type_id',
+        'finished_at'
     ];
 
-
-    public function typeComplaint()
+    public function logs()
     {
-        return $this->belongsTo(\App\Models\TypeComplaint::class, 'complaint_type_id', 'id');
+        return $this->hasMany(\App\Models\ComplaintLog::class, 'complaint_id', 'id');
     }
 
-    public function complainer()
+    public function sender()
     {
-        return $this->belongsTo(\App\User::class, 'user_complaint_id', 'id');
-    }
-
-    public function complaintTrackings()
-    {
-        return $this->belongsToMany(\App\Models\Tracking::class, 'complaint_logs', 'complaint_id', 'tracking_id')->withTimestamps();
+        return $this->belongsTo(\App\User::class, 'sender_id', 'id');
     }
     
     public function assigned()
     {
         return $this->hasOne(\App\Models\Assigned::class, 'complaint_id', 'id');
+    }
+
+    public function types()
+    {
+        return $this->belongsTo(\App\Models\Role::class, 'type_id', 'id');
     }
 }

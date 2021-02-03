@@ -15,11 +15,14 @@ class CreateComplaintsTable extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('complaint_type_id');
+            $table->text('title')->nullable()->default(null);
             $table->longText('messages')->nullable()->default(null);
-            $table->boolean('urgent')->nullable()->default(false);
-            $table->boolean('finished')->nullable()->default(false);
-            $table->unsignedBigInteger('user_complaint_id')->nullable()->default(null);
+            $table->boolean('is_urgent')->nullable()->default(false);
+            $table->boolean('is_finished')->nullable()->default(false);
+            $table->boolean('is_assigned')->nullable()->default(false);
+            $table->unsignedBigInteger('sender_id')->nullable()->default(null);
+            $table->unsignedBigInteger('type_id')->nullable()->default(null);
+            $table->dateTime('finished_at')->nullable()->default(null);
             $table->timestamps();
         });
     }

@@ -10,7 +10,13 @@ class MobileNotification extends Model
     protected $fillable = [
         'type',
         'receiver_id',
+        'messages',
         'data',
         'read_at'
     ];
+
+    public function receiver()
+    {
+        return $this->belongsTo(\App\User, 'receiver_id', 'id');
+    }
 }

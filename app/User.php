@@ -41,14 +41,19 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function usersComplaint()
+    public function complaints()
     {
-        return $this->hasMany(\App\Models\Complaint::class, 'user_complaint_id', 'id');
+        return $this->hasMany(\App\Models\Complaint::class, 'sender_id', 'id');
     }
 
-    public function receiverAssigned()
+    public function assigned()
     {
-        return $this->hasMany(\App\Models\Assigned, 'user_perform_id', 'id');
+        return $this->hasMany(\App\Models\Assigned::class, 'executor_id', 'id');
+    }
+
+    public function mobileNotifications()
+    {
+        return $this->hasMany(\App\Models\MobileNotification::class, 'receiver_id', 'id');
     }
 
 }
