@@ -18,7 +18,8 @@ class CreateAssignedsTable extends Migration
             $table->unsignedBigInteger('complaint_id');
             $table->unsignedBigInteger('executor_id');
             $table->boolean('is_accepted')->nullable()->default(false);
-            $table->longText('image_work')->nullable()->default(null);
+            $table->longText('image')->nullable()->default(null);
+            $table->longText('video')->nullable()->default(null);
             $table->longText('description')->nullable()->default(null);
             $table->dateTime('start_work')->nullable()->default(null);
             $table->dateTime('end_work')->nullable()->default(null);

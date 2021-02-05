@@ -8,6 +8,7 @@ use App\Models\MobileNotification;
 use App\User;
 use App\Models\Assigned;
 use App\Models\Complaint;
+use App\Events\ReadNotificationEvent;
 use Auth;
 
 class MobileNotificationController extends Controller
@@ -47,9 +48,25 @@ class MobileNotificationController extends Controller
         if($record->read_at == null) {
             $record->read_at = \Carbon\Carbon::now();
             $record->save();
+
+            if($record->save()) {
+                event(new ReadNotificationEvent($record, Auth::user()->id));
+            }            
         }
 
+
+
         return response(['result' => $record]);
+    }
+
+    public function countUnread() {
+        if(Auth::user()) {
+            $records = MobileNotification::where('receiver_id', Auth::user()->id)
+                ->where('read_at', '=', null)->count();
+
+            return response(['total' => $records]);
+        }
+        return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);   
     }
     
 }

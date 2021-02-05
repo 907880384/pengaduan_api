@@ -83,7 +83,13 @@ class ComplaintsController extends Controller
     
     public function show($id)
     {
-        $record = Complaint::with(['sender', 'assigned', 'logs', 'types'])->find($id);
+        $record = Complaint::with([
+            'sender', 
+            'assigned', 
+            'logs', 
+            'types'
+        ])->find($id);
+        
         $record->executor = ($record->assigned && $record->assigned != null) ? \App\User::find($record->assigned->executor_id) : null;
 
         if(!$record) {
@@ -258,6 +264,6 @@ class ComplaintsController extends Controller
 
     public function finishWorkComplaint(Request $req)
     {
-
+        
     }
 }

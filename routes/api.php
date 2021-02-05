@@ -29,6 +29,7 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
         Route::group(['prefix' => 'mobile_notifications'], function () {
             Route::get('/show/all', 'MobileNotificationController@showAll');
             Route::get('/read/{notifId}', 'MobileNotificationController@readById');
+            Route::get('/count/unread', 'MobileNotificationController@countUnread');
         });
 
         Route::get('/information/complaints', 'InformationController@getComplaintInfo');

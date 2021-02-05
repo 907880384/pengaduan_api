@@ -41,8 +41,12 @@
                   @foreach ($records as $key => $row)
                     <tr>
                       <td class="text-center">{{ $key + $records->firstItem() }}</td>
-                      <td class="text-center">{{ $row->title }}</td>
-                      <td>{{ $row->messages }}</td>
+                      <td class="text-center">
+                        {{ strlen($row->title) > 50 ? substr($row->title, 0, 50) .'...(more)' : substr($row->title, 0, strlen($row->title)) }}
+                      </td>
+                      <td>
+                        {{ strlen($row->messages) > 50 ? substr($row->messages, 0, 50) . '...(more)' : substr($row->messages, 0, strlen($row->messages)) }}
+                      </td>
                       {{-- Urgent --}}
                       <td class="text-center">
                         @if ($row->is_urgent)
