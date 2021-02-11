@@ -11,12 +11,13 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
 
-class AssignedComplaintEvent implements ShouldBroadcastNow
+class FinishedComplaintEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $data;
     public $receiveData;
     public $mobileNotif;
+
     /**
      * Create a new event instance.
      *
@@ -36,11 +37,11 @@ class AssignedComplaintEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-      return new Channel('assign-complaint-channel');
+      return new Channel('finished-work-complaint-channel');
     }
 
     public function broadcastAs() {
-      return 'AssignedComplaintEvent';
+      return 'FinishWorkComplaintEvent';
     }
 
     public function broadcastWith()

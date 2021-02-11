@@ -35,6 +35,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     /** Complaints */
     Route::resource('complaints', 'Web\ComplaintsController');
+    Route::get('complaints/show/detail/{id}', 'Web\ComplaintsController@showDetail');
     Route::post('assigned/complaints', 'Web\ComplaintsController@assignComplaint');
     Route::get('accept/assigned/{assignedId}/complaints', 'Web\ComplaintsController@startWorkComplaint');
     Route::get('show/finished/working/complaint/{complaint}', 'Web\ComplaintsController@showFinished');

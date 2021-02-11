@@ -7,15 +7,19 @@ require('dotenv').config();
 var redisHost = process.env.REDIS_HOST;
 var redisPort = process.env.REDIS_PORT;
 var serverPort = process.env.BROADCAST_PORT;
-var serverHost = '192.168.43.168';
+var serverHost = '10.110.236.159'; //'192.168.43.168';
 var ioRedis = require('ioredis');
 var redis = new ioRedis(redisPort, redisHost);
+
 var listChannel = {
   complaintChannel: 'complaint-channel',
-  assignedComplaintChannel: 'assign-complaint',
-  assignedWorkingComplaintChannel: 'assign-working-complaint',
-  readNotification: 'read-notification-channel'
+  assignedComplaintChannel: 'assign-complaint-channel',
+  startWorkingComplaintChannel: 'start-work-complaint-channel',
+  finishedWorkingComplaintChannel: 'finished-work-complaint-channel',
+  notificationChannel: 'notification-channel',
 }
+
+
 var sourceData = {
   users: [],
 }
@@ -29,11 +33,15 @@ redis.subscribe(listChannel.assignedComplaintChannel, () => {
 });
 
 redis.subscribe(listChannel.assignedWorkingComplaintChannel, () => {
-  console.log(`Now you subscribe channel ${listChannel.assignedWorkingComplaintChannel}`);
+  console.log(`Now you subscribe channel ${listChannel.startWorkingComplaintChannel}`);
+});
+
+redis.subscribe(listChannel.finishedComplaint, () => {
+  console.log(`Now you subscribe channel ${listChannel.finishedWorkingComplaintChannel}`);
 });
 
 redis.subscribe(listChannel.readNotification, () => {
-  console.log(`Now you subscribe channel ${listChannel.readNotification}`);
+  console.log(`Now you subscribe channel ${listChannel.notificationChannel}`);
 });
 
 
@@ -57,7 +65,7 @@ io.on("connection", function (socket) {
   });
 });
 
-// server.listen(serverPort, '192.168.43.168',() => {
+// server.listen(serverPort, () => {
 //   console.log(`Socket server is running on port ${serverPort}`);
 // });
 

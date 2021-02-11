@@ -39,6 +39,7 @@ mix.styles([
     'node_modules/datatables.net-responsive-bs4/css/responsive.bootstrap4.min.css',
     'node_modules/weathericons/css/weather-icons.min.css',
     'resources/assets/css/style.css',
+    'resources/assets/css/components.css',
     'resources/assets/js/custom.js'
 ], 'public/css/app.css');
 

@@ -20,41 +20,55 @@
       <div class="col-lg-12 col-md-12 col-12">
         <div class="card">
           <div class="card-body p-1">
-            
-            <div class="table-responsive">
-              <table class="table table-striped table-md">
-                <thead>
-                  <tr class="text-center">
-                    <th>#</th>
-                    <th>Nama</th>
-                    <th>Unique ID/Username</th>
-                    <th>Roles</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                  @foreach ($records as $key => $row)
-                    <tr>
-                      <td class="text-center">{{ $key + $records->firstItem() }}</td>
-                      <td>{{ $row->name }}</td>
-                      <td>{{ $row->username }}</td>
-                      <td class="text-center">{{ $row->roles()->first()->name }}</td>
-                      <td class="text-center">
-                        <button type="button" class="btn btn-danger" onclick="deleteRow('{{ $row->id }}')">
-                          <i class="fas fa-trash"></i> Delete
-                        </button>
-                      </td>
-                    </tr>
-                  @endforeach
-                </tbody>
-              </table>
-	            
+            <div class="row m-2">
+              <div class="col-md-6">
+                <div class="form-group row">
+                  <label for="filterRole" class="col-md-3 m-2">Kategori Role</label>
+                  <div class="col-md-8">
+                    <select id="filterRole" name="filterRole" class="form-control-sm form-control">
+                      <option value="">Pilih Kategori Role</option>
+                      @foreach ($roles as $role)
+                        <option value="{{ $role->id }}">{{ Str::ucfirst($role->name) }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-group row">
+                  <label for="filterSearch" class="col-md-3 m-2">Pencarian</label>
+                  <div class="col-md-8">
+                    <input type="text" id="filterSearch" class="form-control" />
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="row m-2">
+              <div class="col-md-12">
+                <button type="button" class="btn btn-primary btn-sm" onclick="filterDatatable()">
+                  <i class="fa fa-filter"></i> Filter
+                </button>
+
+                <button type="button" class="btn btn-success btn-sm" onclick="refreshDatatable()">
+                  <i class="fa fa-spinner"></i> Refresh
+                </button>
+              </div>
+            </div>
+
+            <div class="row">&nbsp;</div>
+
+            <div class="row">
+              <div id="tableUser" class="col-md-12 col-12 col-lg-12">
+                @include('pages.users.user_pagination')
+              </div>
             </div>
             
           </div>
 
-          {{ $records->links('customs.pagination') }}
+          
 
         </div>
       </div>
@@ -69,6 +83,17 @@
 
     const urlDestroy = "{!! url('/users') !!}";
     const urlBackTo = "{!! url('/users') !!}"
+    const urlPagination = "{!! url('/users') !!}"
+
+    function parseQueryString() {
+      var str = window.location.search;
+      var objURL = {};
+      
+      str.replace(new RegExp( "([^?=&]+)(=([^&]*))?", "g" ), ( $0, $1, $2, $3 ) => {
+        objURL[ $1 ] = $3;
+      });
+      return objURL;
+    };
 
     function deleteRow(id) {
       const url = urlDestroy + "/" + id;
@@ -101,6 +126,44 @@
         }
       })
     }
+
+    function filterDatatable(page) {
+      const filterSearch = $("#filterSearch").val();
+      const filterRole = $("#filterRole").val();
+
+      $.ajax({
+        type: "GET",
+        url: urlPagination + '?page=' + page + '&filterRole=' + filterRole + '&filterSearch=' + filterSearch,
+        success: function (data) {
+          console.log("Render Data", data)
+          $("#tableUser").html(data);
+        }
+      });
+      console.log({page, filterSearch, filterRole});
+    }
+
+    function refreshDatatable() {
+      $('select[name="filterRole"]').val('');
+      $("#filterSearch").val('')
+      filterDatatable(1)
+    }
+
+
+    $(function () {
+      $(document).on('click', '.pagination a',function(event)
+      {
+        event.preventDefault();
+        var hrefPage = $(this).attr('href');
+        var page = 1;
+
+        if(hrefPage != '#' && hrefPage != '') {
+          page = parseInt($(this).attr('href').split('page=')[1]);
+        }
+
+        filterDatatable(page)
+
+      });
+    });
 
   </script>
 @endpush

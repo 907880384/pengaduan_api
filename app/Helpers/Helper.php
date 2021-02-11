@@ -24,6 +24,13 @@ class Helper {
             'COMPLAINT_WORK_ACCEPTED' => 'Permintaan pelaksanaan penggaduan diterima',
             'NOTIFICATION_ADD_FAIL' => 'Info notifikasi gagal ditambahkan',
             'NOTIFICATION_NOT_FOUND' => 'Info notifikasi tidak ditemukan',
+            'FILE_NOT_EXIST' => 'File yang diupload kosong',
+            'COMPLAINT_FINISHED' => 'Pekerjaan telah selesai dan Laporan hasil pekerjaan berhasil dikirim',
+            'COMPLAINT_FINISHED_FAIL' => 'Konfirmasi pekerjaan selesai ditolak',
+            'PROFILE_UPDATE' => 'Profil anda berhasil diperbarui',
+            'PROFILE_CREATE' => 'Profil anda berhasil disimpan',
+            'PROFILE_FAILED' => 'Profil gagal disimpan',
+            'USER_INFO_FAILED' => 'Informasi pengguna tidak ditemukan'
         ];
     }
 

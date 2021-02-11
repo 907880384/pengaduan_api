@@ -14,7 +14,7 @@ class Complaint extends Model
         'is_assigned',
         'sender_id',
         'type_id',
-        'finished_at'
+        'finished_at',
     ];
 
     public function logs()

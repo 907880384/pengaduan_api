@@ -37,7 +37,11 @@ class ComplaintsEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('complaint-channel');
+      return new Channel('complaint-channel');
+    }
+
+    public function broadcastAs() {
+      return 'ComplaintEvent';
     }
 
     public function broadcastWith()

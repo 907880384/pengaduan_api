@@ -9,11 +9,36 @@ use App\Models\Role;
 
 class UsersController extends Controller
 {
+    private $page = 10;
+
     public function index()
     {
-        $records = User::orderBy('id', 'desc')->paginate(10);
-        return view('pages.users.index', compact('records'));
+        $roles = Role::where('slug', '!=', 'admin')->where('slug', '!=', 'pegawai')->get();
+        $records = User::with('roles');
+
+        if(request()->query('filterRole') != null) {
+            $filterRole = request()->query('filterRole');
+            $records = $records->whereHas('roles', function($q) use($filterRole) {
+                $q->where('id', $filterRole);
+            });
+        }
+
+        if(request()->query('filterSearch') != null) {
+            $filterSearch = request()->query('filterSearch');
+            $records = $records->where('name' ,'like', '%'.$filterSearch. '%');
+        }
+
+        $records = $records->orderBy('id', 'desc')->paginate($this->page);
+
+        
+        if(request()->ajax()) {
+            return view('pages.users.user_pagination', compact('records'));
+        }
+
+        return view('pages.users.index', compact('records', 'roles'));
     }
+
+
 
     public function show($id)
     {

@@ -16,108 +16,60 @@
   <div class="section-body">
     <h2 class="section-title">List Data Pengaduan</h2>
     <div class="row">
-      <div class="col-12">
+      <div class="col-12 col-lg-12 col-md-12">
         <div class="card">
           <div class="card-body p-1">
             
-            <div class="table-responsive">
-              <table id="complaintTable" class="table table-condensed" style="width: 100%">
-                <thead>
-                  <tr class="text-center">
-                    <th>#</th>
-                    <th>Perihal/Judul</th>
-                    <th>Pesan Pengaduan</th>
-                    <th>Penting (Urgent)</th>
-                    <th>Selesai (Finish)</th>
-                    <th>Penugasan (Assigned)</th>
-                    <th>Pengirim Pesan</th>
-                    <th>Pelaksana</th>
-                    <th>Waktu Pengiriman</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  
-                  @foreach ($records as $key => $row)
-                    <tr>
-                      <td class="text-center">{{ $key + $records->firstItem() }}</td>
-                      <td class="text-center">
-                        {{ strlen($row->title) > 50 ? substr($row->title, 0, 50) .'...(more)' : substr($row->title, 0, strlen($row->title)) }}
-                      </td>
-                      <td>
-                        {{ strlen($row->messages) > 50 ? substr($row->messages, 0, 50) . '...(more)' : substr($row->messages, 0, strlen($row->messages)) }}
-                      </td>
-                      {{-- Urgent --}}
-                      <td class="text-center">
-                        @if ($row->is_urgent)
-                          <div class="badge badge-danger">
-                            PENTING
-                          </div>
-                        @else 
-                          <div class="badge badge-info">
-                            BIASA
-                          </div>
-                        @endif
-                      </td>
-                      {{-- Selesai --}}
-                      <td class="text-center">
-                        @if ($row->is_finished)
-                          <div class="badge badge-primary">
-                          SELESAI
-                          </div> 
-                        @else
-                        <div class="badge badge-secondary">
-                          BELUM SELESAI
-                        </div>
-                        @endif
-                      </td>
-                      {{-- Penugasan --}}
-                      <td class="text-center">
-                        @if ($row->is_assigned)
-                          <div class="badge badge-success">
-                            DITUGASKAN
-                          </div>
-                        @else
-                          <div class="badge badge-warning">
-                            MENUNGGU DITUGASKAN
-                          </div>
-                        @endif
-                      </td>
-                      <td class="text-center">{{ $row->sender->name }}</td>
-                      <td class="text-center">
-                        @if ($row->executor)
-                          <b>{{ $row->executor->name }}</b>
-                        @else
-                          &nbsp;
-                        @endif
-                      </td>
-                      <td class="text-center">{{ $row->created_at }}</td>
+            <div class="row m-2">
+              <div class="col-md-6">
+                <div class="form-group row">
+                  <label for="sentences" class="col-md-3 m-2">Aktivitas</label>
+                  <div class="col-md-8">
+                    <select id="sentences" name="sentences" class="form-control-sm form-control">
+                      @foreach ($activities as $item)
+                        <option value="{{ $item['type'] }}">{{ Str::ucfirst($item['value']) }}</option>
+                      @endforeach
+                    </select>
+                  </div>
+                </div>
+              </div>
 
-                      <td class="text-center">
-                        @if ($row->is_finished)
-                        <a href="#" class="badge badge-info">
-                          <i class="fas fa-eye"></i> Detail
-                        </a>
-                        @endif
+              <div class="col-md-6">
+                <div class="form-group row">
+                  <label for="search" class="col-md-3 m-1">Pencarian</label>
+                  <div class="col-md-5 m-0">
+                    <input type="text" id="search" class="form-control" /> 
+                  </div>
+                  <div class="col-md-3">
+                    <button type="button" class="btn btn-secondary">
+                      <i class="fa fa-search"></i> Cari
+                    </button>
+                  </div>
+                </div>
+              </div>
 
-                        @if (auth()->user()->roles()->first()->slug === 'admin')
-                          @if (!$row->is_assigned && !$row->is_finished)
-                          <button class="badge badge-primary" onclick="showAssignModal('{{ $row->id }}', '{{ $row->type_id }}')">
-                            <i class="fas fa-tag"></i> Assign
-                          </button>
-                          @endif
-                        @endif
-                      </td>
-                    </tr>
-                  @endforeach
-                </tbody>
-              </table>
-	            
+            </div>
+
+            <div class="row m-2">
+              <div class="col-md-12">
+                <button type="button" class="btn btn-success btn-sm" onclick="refreshDatatable()">
+                  <i class="fa fa-spinner"></i> Refresh
+                </button>
+              </div>
+            </div>
+
+            {{-- DATA TABLE --}}
+            <div class="row">&nbsp;</div>
+
+            <div class="row">
+              <div id="tableComplaint" class="col-md-12 col-12 col-lg-12">
+                @include('pages.complaints.complaint_pagination')
+              </div>
             </div>
             
           </div>
 
-          {{ $records->links('customs.pagination') }}
+          
 
         </div>
       </div>
@@ -174,6 +126,7 @@
     const urlBackTo = "{{ url('/complaints') }}"
     const urlUsers = "{{ url('/users/roles') }}";
     const urlAssigned = "{{ url('/assigned/complaints') }}";
+    const urlPagination = "{!! url('/complaints') !!}"
 
     function setSelect2(data, select, option = null) {
       let records = [];
@@ -211,6 +164,25 @@
       });
     }
 
+    function filterDatatable(page) {
+      const sentences = $('#sentences').val();
+      const search = $('#search').val();
+
+      $.ajax({
+        type: "GET",
+        url: urlPagination + '?page=' + page + '&sentences=' + sentences + '&search=' + search,
+        success: function (data) {  
+          $("#tableComplaint").html(data);
+        }
+      });
+    }
+
+    function refreshDatatable() {
+      $('select[name="sentences"]').val('all');
+      $("#search").val('')
+      filterDatatable(1);
+    }
+
     $(function () {
 
       $("#buttonAssign").click(function (e) { 
@@ -240,6 +212,32 @@
         }).catch((err) => {
           console.log(err.response);
         })
+      });
+
+
+      $("#sentences").change(function (e) { 
+        e.preventDefault();
+        var hrefs = $('.pagination a').attr('href');
+        var page = 1;
+
+        if(hrefs != '#' && hrefs != '') {
+          page = parseInt(hrefs.split('page=')[1]);
+        }
+
+        filterDatatable(page)
+      });
+
+      $(document).on('click', '.pagination a',function(e)
+      {
+        e.preventDefault();
+        var hrefPage = $(this).attr('href');
+        var page = 1;
+
+        if(hrefPage != '#' && hrefPage != '') {
+          page = parseInt($(this).attr('href').split('page=')[1]);
+        }
+
+        filterDatatable(page)
       });
 
     });

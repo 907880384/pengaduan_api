@@ -13,10 +13,10 @@
         <div class="card">
           <div class="card-body p-1">
             
-            <div class="table-responsive">
-              <table class="table table-striped table-md">
+            <div class="table-responsive-md">
+              <table class="table table-sm table-striped table-hover table-bordered">
                 <thead>
-                  <tr class="text-center">
+                  <tr class="text-center bg-primary text-white">
                     <th>#</th>
                     <th>Nama</th>
                     <th>Slug</th>

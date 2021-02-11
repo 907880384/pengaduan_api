@@ -36,7 +36,11 @@ class AssignedWorkingComplaintEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('assign-working-complaint');
+      return new Channel('start-work-complaint-channel');
+    }
+
+    public function broadcastAs() {
+      return 'StartWorkComplaintEvent';
     }
 
     public function broadcastWith()

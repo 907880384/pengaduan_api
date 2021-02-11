@@ -9,9 +9,13 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
     Route::post('register', 'AuthController@register');
 
     Route::group(['middleware' => 'auth:api'], function () {   
-        Route::get('users', 'UsersController@index');
         Route::get('logout', 'AuthController@logout');
 
+        /** Users */
+        Route::get('users', 'UsersController@index');
+        Route::post('profile/user', 'UsersController@profile');
+        Route::get('info/user', 'UsersController@getInfo');
+        
         /** Roles */
         Route::resource('roles', 'RolesController')->except(['edit', 'create']);
         Route::get('operational/roles', 'RolesController@getOperationalRoles');
@@ -23,7 +27,7 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
         Route::resource('complaints', 'ComplaintsController')->except(['edit', 'create']);
         Route::post('assigned/complaints', 'ComplaintsController@assignComplaint');
         Route::get('accept/assigned/{assignedId}/complaints', 'ComplaintsController@startWorkComplaint');
-        
+        Route::post('finished/complaint', 'ComplaintsController@finishedComplaint');
         
         /** Read Notification Mobile */
         Route::group(['prefix' => 'mobile_notifications'], function () {

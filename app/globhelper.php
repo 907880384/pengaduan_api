@@ -21,12 +21,6 @@ if(!function_exists('routerCollections')) {
         "components" => [
           [
             "to" => "admin",
-            "title" => "Kategori",
-            "route" => '/categories/complaint',
-            "icon" => "fas fa-dumbbell",
-          ],
-          [
-            "to" => "admin",
             "title" => "Pengguna",
             "route" => '/users',
             "icon" => "fas fa-user",
@@ -48,12 +42,6 @@ if(!function_exists('routerCollections')) {
             "title" => "Pengaduan",
             "route" => '/complaints',
             "icon" => "fas fa-comments",
-          ],
-          [
-            "to" => "all",
-            "title" => "Aktivitas",
-            "route" => '/activities',
-            "icon" => "fas fa-map-marked",
           ],
         ], 
       ],

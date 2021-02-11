@@ -34,7 +34,11 @@ class ReadNotificationEvent implements ShouldBroadcastNow
      */
     public function broadcastOn()
     {
-        return new Channel('read-notification-channel');
+      return new Channel('notification-channel');
+    }
+
+    public function broadcastAs() {
+      return 'NotificationEvent';
     }
 
     public function broadcastWith()

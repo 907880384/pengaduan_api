@@ -31,24 +31,34 @@ class ComplaintsController extends Controller
             return abort(404);
         }
 
-        $sentences = request()->query('sentences');
-        $search = request()->query('search');
-        $slug = strtolower($user->roles()->first()->slug);
+        $activities = [
+            ['type' => 'all', 'value' => 'Seluruh Aktivitas'],
+            ['type' => 'not_assigned', 'value' => 'Belum Ditugaskan'],
+            ['type' => 'assigned_accepted', 'value' => 'Ditugaskan, Dilaksanakan'],
+            ['type' => 'finished', 'value' => 'Pekerjaan Selesai']
+        ];
 
-        $records = Complaint::with(['sender', 'assigned', 'logs']);
+        $slug = strtolower($user->roles()->first()->slug);
+        $records = Complaint::with(['sender', 'assigned', 'logs', 'types']);
+        $search = '';
+        $sentences = 'all';
+
+        if(request()->query('search') != null) {
+            $search = request()->query('search');
+        }
+
+        if(request()->query('sentences') != null) {
+            $sentences = request()->query('sentences');    
+        }
+
 
         if($sentences) {
             switch ($sentences) {
                 case 'not_assigned':
                     $records = $records->where('is_assigned',  false);
                     break;
-                case 'assigned':
-                    $records = $records->where('is_assigned', true);
-                    break;
-                case 'accepted':
-                    $records = $records->where('is_assigned', '=', true)->whereHas('assigned', function($q){
-                        $q->where('is_accepted', true);
-                    })->where('is_finished', '=', false);
+                case 'assigned_accepted':
+                    $records = $records->where('is_assigned', true)->where('is_finished', false);
                     break;
                 case 'finished':
                     $records = $records->where('is_assigned', true)->where('is_finished', true);
@@ -69,13 +79,13 @@ class ComplaintsController extends Controller
             });
         }
 
-        if($search && $search != '') {
+        if($search != '') {
             $records = $records->where('title', 'like', '%'.$search.'%');
         }
 
         $records = $records->orderBy('updated_at', 'desc')->paginate($this->page);
 
-        $records->getCollection()->transform(function($query) {
+        $records->data = $records->getCollection()->transform(function($query) {
             if($query->assigned != null) {
                 $query->executor = \App\User::find($query->assigned->executor_id);
             }
@@ -83,7 +93,11 @@ class ComplaintsController extends Controller
         });     
         
         
-        return view('pages.complaints.index', compact('records'));
+        if(request()->ajax()) {
+            return view('pages.complaints.complaint_pagination', compact('records'));
+        }
+
+        return view('pages.complaints.index', compact('records', 'activities'));
     }
 
     public function create() {
@@ -93,14 +107,27 @@ class ComplaintsController extends Controller
 
     public function show($id)
     {
-        $record = Complaint::with(['sender', 'assigned', 'logs'])->find($id);
+        $record = Complaint::with(['sender', 'assigned', 'logs', 'types'])->find($id);
 
         if(!$record) {
             return $this->sendResponse(Helper::messageResponse()->COMPLAINT_NOT_FOUND, 404);    
         }
 
+        if($record->assigned != null) {
+            $record->executor = \App\User::find($record->assigned->executor_id);
+        }
 
         return response(['result' => $record], 200);
+    }
+
+    public function showDetail($id) {
+        $record = Complaint::with(['sender', 'assigned', 'logs', 'types'])->find($id);
+
+        if($record->assigned != null) {
+            $record->executor = \App\User::find($record->assigned->executor_id);
+        }
+
+        return view('pages.complaints.detail', compact('record'));
     }
 
     public function destroy($id)

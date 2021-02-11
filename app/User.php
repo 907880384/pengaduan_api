@@ -56,4 +56,14 @@ class User extends Authenticatable
         return $this->hasMany(\App\Models\MobileNotification::class, 'receiver_id', 'id');
     }
 
+    public function attachFinished()
+    {
+        return $this->belongsTo(\App\Models\Assigned::class, 'attacher_id', 'id');
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(\App\Models\Profile::class, 'user_id', 'id');
+    }
+
 }

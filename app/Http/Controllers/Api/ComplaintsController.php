@@ -8,12 +8,15 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\Complaint;
 use App\Models\Role;
 use App\Models\Assigned;
-use App\User;
+use App\Models\StatusProcess;
 use App\Models\MobileNotification;
 use App\Events\ComplaintsEvent;
 use App\Events\AssignedComplaintEvent;
 use App\Events\AssignedWorkingComplaintEvent;
+use App\Events\FinishedComplaintEvent;
+use App\User;
 use Helper;
+use File;
 
 class ComplaintsController extends Controller
 {
@@ -91,6 +94,10 @@ class ComplaintsController extends Controller
         ])->find($id);
         
         $record->executor = ($record->assigned && $record->assigned != null) ? \App\User::find($record->assigned->executor_id) : null;
+
+        if($record->is_finished) {
+            $record->assigned->filepath = url($record->assigned->filepath);
+        }
 
         if(!$record) {
             return $this->sendResponse(Helper::messageResponse()->COMPLAINT_NOT_FOUND, 404);    
@@ -262,8 +269,86 @@ class ComplaintsController extends Controller
         return $this->sendResponse(Helper::messageResponse()->COMPLAINT_WORK_ACCEPTED);
     }
 
-    public function finishWorkComplaint(Request $req)
+    public function finishedComplaint(Request $req)
     {
+        $slug = strtolower(Auth::user()->roles()->first()->slug);
+
+        if($slug == 'admin' || $slug == 'pegawai') {
+            return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
+        }
+
+        $req->validate([
+            'assigned_id' => 'required',
+            'description' => 'required',
+            'file_upload' => 'required',
+        ]);
+
         
+        $assigned = Assigned::find($req->assigned_id);
+
+        if(!$assigned) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_NOT_FOUND, 404);
+        }
+
+
+        if(!$req->file('file_upload')) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_NOT_FOUND, 404);
+        }
+
+        if($assigned->filename != null || $assigned->filepath != null) {
+
+            if(file_exists(public_path($assigned->filepath))) {
+                unlink(public_path($assigned->filepath));
+            }
+
+        }
+
+        $filename = 'C'.$assigned->complaint_id . '_' . time(). '_' . $req->file('file_upload')->getClientOriginalName();
+        $pathname = $req->file('file_upload')->storeAs('complaints', $filename, 'public');
+        
+        $assigned->description = $req->description;
+        $assigned->filepath = '/storage/' . $pathname;
+        $assigned->filename = $filename;
+        $assigned->end_work = \Carbon\Carbon::now();
+        $assigned->status_id = StatusProcess::where('slug', 'selesai')->first()->id;
+        $assigned->attacher_id = Auth::user()->id;
+
+        if(!$assigned->save()) {
+            return $this->sendResponse(Helper::messageResponse()->COMPLAINT_FINISHED_FAIL, 400);
+        }
+
+
+        $complaint = Complaint::with([
+            'sender', 
+            'assigned', 
+            'logs', 
+            'types'
+        ])->find($assigned->complaint_id);
+        $complaint->is_finished = true;
+        $complaint->save();
+
+
+        $mobileNotif = MobileNotification::insert([
+            [
+                'type' => 'FINISHED_COMPLAINT',
+                'receiver_id' => $complaint->sender_id,
+                'messages' => Auth::user()->name. " telah menyelesaikan pekerjaan dan melaporkan hasil pekerjaan dengan baik",
+                'data' => json_encode($complaint, true),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ],
+            [
+                'type' => 'FINISHED_COMPLAINT',
+                'receiver_id' => 1,
+                'messages' => Auth::user()->name. " telah menyelesaikan pekerjaan dan melaporkan hasil pekerjaan dengan baik",
+                'data' => json_encode($complaint, true),
+                'created_at' => \Carbon\Carbon::now(),
+                'updated_at' => \Carbon\Carbon::now(),
+            ]
+        ]);
+
+        event(new FinishedComplaintEvent($complaint, [$complaint->sender_id, 1], $mobileNotif));
+        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_FINISHED);
+
     }
 }

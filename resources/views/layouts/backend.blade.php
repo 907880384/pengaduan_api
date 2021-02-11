@@ -38,22 +38,26 @@
       event: {
         complaint: {
           channelName: 'complaint-channel',
-          eventName: "App\\Events\\ComplaintsEvent"
+          eventName: "ComplaintEvent"
         },
         assignedComplaint: {
-          channelName: 'assign-complaint',
-          eventName: 'App\\Events\\AssignedComplaintEvent'
+          channelName: 'assign-complaint-channel',
+          eventName: 'AssignedComplaintEvent'
         },
         assignedWorkingComplaint: {
-          channelName: 'assign-working-complaint',
-          eventName: 'App\\Events\\AssignedWorkingComplaintEvent'
-        }
+          channelName: 'start-work-complaint-channel',
+          eventName: 'StartWorkComplaintEvent'
+        },
+        finishWorkComplaint: {
+          channelName: 'finished-work-complaint-channel',
+          eventName: 'FinishWorkComplaintEvent',
+        },
+        notification: {
+          channelName: 'notification-channel',
+          eventName: 'NotificationEvent',
+        },
+        
       },
-      notification:{
-        complaint: "App\\Notifications\\NotifikasiComplaint",
-        assignedComplaint: "App\\Notifications\\AssignedNotif",
-        assignedWorkComplaint: "App\\Notifications\\AssignedWorkingComplaint"
-      }
     }
 
     var notifications = [];
@@ -137,7 +141,7 @@
       // let socketPORT = "8005";
 
       //Internet
-      let socketIP   = "192.168.43.168" //"127.0.0.1";
+      let socketIP   = "10.110.236.159"; //"192.168.43.168" //"127.0.0.1";
       let socketPORT = "8005";
 
       let socket = io(socketIP + ":" + socketPORT);
