@@ -141,7 +141,7 @@
       // let socketPORT = "8005";
 
       //Internet
-      let socketIP   = "10.110.236.159"; //"192.168.43.168" //"127.0.0.1";
+      let socketIP   = "192.168.43.168" //"127.0.0.1";
       let socketPORT = "8005";
 
       let socket = io(socketIP + ":" + socketPORT);

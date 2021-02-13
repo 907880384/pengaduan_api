@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\User;
 use Auth;
+use Storage;
 
 class AuthController extends Controller
 {
@@ -21,7 +22,15 @@ class AuthController extends Controller
         
         if(Auth::attempt(['username' => $req->username, 'password' => $req->password])) {
             $token = Auth::user()->createToken($this->secreter)->accessToken;
-            $user = User::with('roles')->find(Auth::user()->id);
+            $user = User::with(['roles', 'profile'])->find(Auth::user()->id);
+
+            if($user->profile != null) {
+                $path = Storage::url($user->profile->thumbnail);
+                if($user->profile->thumbnail != '' && $user->profile->thumbnail != null) {
+                    $user->profile->thumbnail = url($path); 
+                }
+            }
+
             return response(['token' => $token, 'user' => $user] ,200);
         }
         else {

@@ -17,6 +17,7 @@ use App\Events\FinishedComplaintEvent;
 use App\User;
 use Helper;
 use File;
+use Storage;
 
 class ComplaintsController extends Controller
 {
@@ -96,7 +97,13 @@ class ComplaintsController extends Controller
         $record->executor = ($record->assigned && $record->assigned != null) ? \App\User::find($record->assigned->executor_id) : null;
 
         if($record->is_finished) {
-            $record->assigned->filepath = url($record->assigned->filepath);
+
+            if($record->assigned->filepath != '' && $record->assigned->filepath != null) {
+                $path = Storage::url($record->assigned->filepath);
+                $record->assigned->filepath = url($path);
+            }
+
+            
         }
 
         if(!$record) {

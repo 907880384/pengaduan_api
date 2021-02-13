@@ -7,7 +7,7 @@ require('dotenv').config();
 var redisHost = process.env.REDIS_HOST;
 var redisPort = process.env.REDIS_PORT;
 var serverPort = process.env.BROADCAST_PORT;
-var serverHost = '10.110.236.159'; //'192.168.43.168';
+var serverHost = '192.168.43.168'; //'10.110.236.159'; //;
 var ioRedis = require('ioredis');
 var redis = new ioRedis(redisPort, redisHost);
 

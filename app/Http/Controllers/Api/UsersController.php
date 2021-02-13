@@ -9,6 +9,8 @@ use App\User;
 use Helper;
 use Auth;
 use File;
+use Storage;
+use Response;
 
 class UsersController extends Controller
 {
@@ -23,48 +25,59 @@ class UsersController extends Controller
 
     public function profile(Request $req) {
         
-        if(Auth::user()) {
+        $pathname = null;
 
-            $pathname = null;
+        $req->validate([
+            "name" => "required",
+            "username" => "required|unique:users,username,".Auth::user()->id, 
+        ]);
 
-            if($req->file('thumbnail')) {   
-                $pathname = $req->file('thumbnail')->storeAs(
-                    'profiles', 
-                    'user_' . Auth::user()->id . time(). '_' . $req->file('thumbnail')->getClientOriginalName(), 
-                    'public'
-                );
-            }
+        $user = User::with(['roles', 'profile'])->find(Auth::user()->id);
+
+        $user->username = $req->username;
+        $user->name = $req->name;
+        $user->save();
+
+        if($req->file('thumbnail')) {   
+            $pathname = $req->file('thumbnail')->storeAs(
+                'profiles', 
+                'user_' . Auth::user()->id . time(). '_' . $req->file('thumbnail')->getClientOriginalName(), 
+                'public'
+            );
+        }
 
 
-            $profile = Profile::find(Auth::user()->id);
+        if($user->profile == null) {
+            $user->profile()->create([
+                'phone' => $req->phone == null ? '': $req->phone,
+                'email' => $req->email == null ? '': $req->email,
+                'thumbnail' => $pathname,
+                'identity' => $req->identity == null ? '': $req->identity
+            ]);
 
-            if(!$profile) {
-                //Create
-                $profile = Profile::create([
-                    'user_id' => Auth::user()->id,
-                    'phone' => $req->phone,
-                    'email' => $req->email,
-                    'thumbnail' => $pathname,
-                    'identity' => $req->identity
-                ]);
+            return response([
+                'message' => Helper::messageResponse()->PROFILE_CREATE,
+            ], 200);
+        }
+        else {
 
-                if($profile) {
-                    return $this->sendResponse(Helper::messageResponse()->PROFILE_CREATE);
+            if($req->isChangeThumbnail == true) {
+                if(file_exists(public_path($user->profile->thumbnail))) {
+                    unlink(public_path($user->profile->thumbnail));
                 }
             }
-            else {
-                //Update
-                $profile->phone = $req->phone;
-                $profile->email = $req->email;
-                $profile->thumbnail = $pathname;
-                $profile->identity = $req->identity;
-                
-                if($profile->save()) {
-                    return $this->sendResponse(Helper::messageResponse()->PROFILE_UPDATE);
-                }
-            }
 
-            return $this->sendResponse(Helper::messageResponse()->PROFILE_FAILED, 400);
+            //Update
+            $user->profile->phone = $req->phone == null ? '': $req->phone;
+            $user->profile->email = $req->email == null ? '': $req->email;
+            $user->profile->thumbnail = $pathname;
+            $user->profile->identity = $req->identity == null ? '': $req->identity;
+            
+            if($user->profile->save()) {
+                return response([
+                    'message' => Helper::messageResponse()->PROFILE_UPDATE,
+                ], 200);
+            }
         }
         
         return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
@@ -72,6 +85,7 @@ class UsersController extends Controller
 
     public function getInfo() {
         $user = User::with([
+            'roles',
             'profile',
             'complaints',
         ])->find(Auth::user()->id);
@@ -82,10 +96,11 @@ class UsersController extends Controller
 
         if($user->profile != null) {
             if($user->profile->thumbnail != '' && $user->profile->thumbnail != null) {
-                $user->profile->thumbnail = url($user->profile->thumbnail);
+                $path = Storage::url($user->profile->thumbnail);
+                $user->profile->thumbnail = url($path);
             }
         }
 
-        return response(['user' => $user]);
+        return response(['result' => $user]);
     }
 }
