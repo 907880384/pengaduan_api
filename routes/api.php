@@ -15,6 +15,7 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
         Route::get('users', 'UsersController@index');
         Route::post('profile/user', 'UsersController@profile');
         Route::get('info/user', 'UsersController@getInfo');
+        Route::post('users/change/password', 'UsersController@changePassword');
         
         /** Roles */
         Route::resource('roles', 'RolesController')->except(['edit', 'create']);

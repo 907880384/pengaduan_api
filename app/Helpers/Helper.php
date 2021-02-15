@@ -30,7 +30,10 @@ class Helper {
             'PROFILE_UPDATE' => 'Profil anda berhasil diperbarui',
             'PROFILE_CREATE' => 'Profil anda berhasil disimpan',
             'PROFILE_FAILED' => 'Profil gagal disimpan',
-            'USER_INFO_FAILED' => 'Informasi pengguna tidak ditemukan'
+            'USER_INFO_FAILED' => 'Informasi pengguna tidak ditemukan',
+            'PASSWORD_CHANGE_SUCCESS' => 'Password berhasil diubah',
+            'PASSWORD_CHANGE_FAILED' => 'Password gagal diubah'
+            
         ];
     }
 

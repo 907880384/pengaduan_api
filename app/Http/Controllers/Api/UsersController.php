@@ -103,4 +103,24 @@ class UsersController extends Controller
 
         return response(['result' => $user]);
     }
+
+    public function changePassword(Request $req) {
+        
+        if(Auth::user()) {
+            $req->validate([
+                'password' => 'required|confirmed'
+            ]);
+    
+            $user = User::find(Auth::user()->id);
+            $user->password = bcrypt($req->password);
+
+            if($user->save()) {
+                return $this->sendResponse(Helper::messageResponse()->PASSWORD_CHANGE_SUCCESS, 200);
+            }
+
+            return $this->sendResponse(Helper::messageResponse()->PASSWORD_CHANGE_FAILED, 400); 
+        }
+
+        return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
+    }
 }
