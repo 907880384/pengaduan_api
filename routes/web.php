@@ -10,6 +10,8 @@ Route::post('login', 'Web\AuthController@authLogin')->name('login');
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'Web\DashboardController@index')->name('dashboard');
     Route::get('dashboard', 'Web\DashboardController@index')->name('dashboard');
+    Route::get('dashboard/statistic', 'Web\DashboardController@getStatistics');
+
     Route::get('logout', 'Web\AuthController@logout')->name('logout');
 
     /** Notification */
@@ -40,6 +42,16 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('accept/assigned/{assignedId}/complaints', 'Web\ComplaintsController@startWorkComplaint');
     Route::get('show/finished/working/complaint/{complaint}', 'Web\ComplaintsController@showFinished');
     Route::post('finish/working/complaint', 'Web\ComplaintsController@finishWorkComplaint');
+
+
+    /** Products */
+    Route::resource(
+        'products', 
+        'Web\ProductController', 
+        ['only' => ['index', 'create', 'show', 'store',   'edit', 'destroy']]
+    );
+
+    Route::post('products/{id}', 'Web\ProductController@update');
 
 
     /** Activities */

@@ -31,6 +31,12 @@ if(!function_exists('routerCollections')) {
             "route" => '/roles',
             "icon" => "fas fa-user-tag",
           ],
+          [
+            "to" => "admin",
+            "title" => "Barang",
+            "route" => '/products',
+            "icon" => "fab fa-product-hunt",
+          ],
         ]
       ],
       [

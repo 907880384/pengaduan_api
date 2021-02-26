@@ -17,13 +17,7 @@
         <div class="card author-box card-primary">
           <div class="card-body">
             
-            <div class="author-box-left" style="margin-right: 10">
-              @if ($record->assigned == null || $record->assigned->filepath == null)
-                <img alt="image" src="{{ asset('images/emptyimage.png') }}" width="250" height="250">
-              @else
-
-              @endif
-            </div>
+            
 
             <div class="author-box-details">
               <div class="author-box-name">
@@ -124,8 +118,7 @@
               </div>
               @endif
               
-              
-
+             
               
             </div>
           </div>
@@ -206,6 +199,12 @@
                     @endif
                   @endif
 
+
+                  @if ($record->assigned == null || $record->assigned->filepath == null)
+                    <img alt="image" src="{{ asset('images/emptyimage.png') }}" width="250" height="250">
+                  @else
+                    <img alt="image" src='{{ url("").$record->assigned->filepath }}' width="400" height="300">
+                  @endif
 
                 </ul>
               </div>

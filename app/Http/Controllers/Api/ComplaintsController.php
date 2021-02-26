@@ -99,8 +99,10 @@ class ComplaintsController extends Controller
         if($record->is_finished) {
 
             if($record->assigned->filepath != '' && $record->assigned->filepath != null) {
-                $path = Storage::url($record->assigned->filepath);
-                $record->assigned->filepath = url($path);
+                // $path = Storage::url($record->assigned->filepath);
+                // $record->assigned->filepath = url($path);
+
+                $record->assigned->filepath = url($record->assigned->filepath);
             }
 
             

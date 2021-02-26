@@ -34,6 +34,10 @@
 
   <script>
     var urlNotif = "{{ url('mobile_notification') }}"
+
+    window.CLIENT_SOCKET_HOST = "127.0.0.1"; //"192.168.43.168";
+    window.CLIENT_SOCKET_PORT = "8005";
+
     window.globalBroadcast = {
       event: {
         complaint: {
@@ -56,7 +60,6 @@
           channelName: 'notification-channel',
           eventName: 'NotificationEvent',
         },
-        
       },
     }
 
@@ -132,17 +135,8 @@
     $(function () { 
       
       let authUser   = @json(auth()->user());
-      //Local
-      // let socketIP   = "127.0.0.1";
-      // let socketPORT = "8005";
-
-      //Wifi Bobo
-      // let socketIP = "192.168.1.15";
-      // let socketPORT = "8005";
-
-      //Internet
-      let socketIP   = "192.168.43.168" //"127.0.0.1";
-      let socketPORT = "8005";
+      let socketIP   = CLIENT_SOCKET_HOST; //"127.0.0.1";
+      let socketPORT = CLIENT_SOCKET_PORT;
 
       let socket = io(socketIP + ":" + socketPORT);
 
@@ -174,6 +168,15 @@
       });
       
       socket.on(globalBroadcast.event.assignedWorkingComplaint.channelName + ":" + globalBroadcast.event.assignedWorkingComplaint.eventName, (message) => {
+        console.log(message);       
+        const filters = message.receiveData.filter((item) => item == authUser.id);
+        if(filters.length > 0) {
+          loadNotification(filters[0]);
+        }
+      });
+
+
+      socket.on(globalBroadcast.event.finishWorkComplaint.channelName + ":" + globalBroadcast.event.finishWorkComplaint.eventName, (message) => {
         console.log(message);       
         const filters = message.receiveData.filter((item) => item == authUser.id);
         if(filters.length > 0) {

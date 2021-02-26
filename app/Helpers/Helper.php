@@ -32,8 +32,12 @@ class Helper {
             'PROFILE_FAILED' => 'Profil gagal disimpan',
             'USER_INFO_FAILED' => 'Informasi pengguna tidak ditemukan',
             'PASSWORD_CHANGE_SUCCESS' => 'Password berhasil diubah',
-            'PASSWORD_CHANGE_FAILED' => 'Password gagal diubah'
+            'PASSWORD_CHANGE_FAILED' => 'Password gagal diubah',
             
+            'PRODUCT_CREATE_SUCCESS' => 'Data barang baru berhasil disimpan',
+            'PRODUCT_UPDATE_SUCCESS' => 'Data barang berhasil diperbarui',
+            'PRODUCT_CREATE_FAILED' => 'Data barang baru gagal disimpan',
+            'PRODUCT_UPDATE_FAILED' => 'Data barang gagal diperbarui',
         ];
     }
 

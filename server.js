@@ -7,7 +7,8 @@ require('dotenv').config();
 var redisHost = process.env.REDIS_HOST;
 var redisPort = process.env.REDIS_PORT;
 var serverPort = process.env.BROADCAST_PORT;
-var serverHost = '192.168.43.168'; //'10.110.236.159'; //;
+// var serverHost = '192.168.43.168'; 
+var serverHost = '127.0.0.1';
 var ioRedis = require('ioredis');
 var redis = new ioRedis(redisPort, redisHost);
 
@@ -47,8 +48,7 @@ redis.subscribe(listChannel.readNotification, () => {
 
 redis.on('message', (channel,message) => {
   message = JSON.parse(message);
-  console.log("Message On", message);
-  console.log("Channel On", channel);
+  console.log("[Run On Channel] On", channel);
   io.emit(channel + ":" + message.event, message.data);
 });
 

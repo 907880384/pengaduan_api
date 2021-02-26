@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
                 'role' => 'pegawai'
             ],
             [
-                'name' => 'Ronaldo', 
+                'name' => 'Risco Arizona', 
                 'username' => 'rn', 
                 'password' => bcrypt('12'),
                 'role' => 'pegawai'
