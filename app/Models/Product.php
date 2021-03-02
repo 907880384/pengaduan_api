@@ -21,4 +21,9 @@ class Product extends Model
     {
         return $this->hasMany(\App\Models\ProductFile::class, 'product_id', 'id');
     }
+
+    public function orders()
+    {
+        return $this->hasMany(\App\Models\Order::class, 'product_id', 'id');
+    }
 }

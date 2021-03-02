@@ -37,6 +37,15 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
             Route::get('/count/unread', 'MobileNotificationController@countUnread');
         });
 
+
+        /** Product */
+        Route::resource('products', 'ProductController')->except(['edit', 'store', 'create', 'update', 'destroy']);
+
+
+        /** Orders */
+        Route::get('orders', 'OrderController@index');
+        Route::post('orders/add/cart', 'OrderController@addCartOrder');
+
         Route::get('/information/complaints', 'InformationController@getComplaintInfo');
 
     });

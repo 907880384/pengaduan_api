@@ -193,7 +193,7 @@ class ProductController extends Controller
             }
         }
 
-        // return $this->sendResponse(Helper::messageResponse()->PRODUCT_UPDATE_SUCCESS, 200); 
+        return $this->sendResponse(Helper::messageResponse()->PRODUCT_UPDATE_SUCCESS, 200); 
     }
 
     /**
@@ -204,6 +204,29 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $product = Product::with(['fileImages'])->find($id);
+
+        if(!$product) {
+            return $this->sendResponse(Helper::messageResponse()->PRODUCT_NOT_FOUND, 404); 
+        }
+
+        // $name = $product->product_name;
+        
+        if(count($product->fileImages) > 0) {
+            $fileImages = $product->fileImages;
+
+            $ids = [];
+            foreach ($fileImages as $value) {
+                if(file_exists(public_path(). '/storage/'. $value->filepath )) {
+                    unlink(public_path() . '/storage/'. $value->filepath);
+                }
+                $ids[] = $value->id;
+            }
+            ProductFile::whereIn('id', $ids)->delete();
+        }
+
+        $product->delete();
+
+        return $this->sendResponse(Helper::messageResponse()->PRODUCT_DELETE_SUCCESS, 200); 
     }
 }

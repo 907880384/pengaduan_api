@@ -53,6 +53,12 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::post('products/{id}', 'Web\ProductController@update');
 
+    /** Orders */
+    Route::resource(
+        'orders', 
+        'Web\OrderController', 
+        ['only' => ['index', 'show']]
+    );
 
     /** Activities */
     Route::group(['prefix' => 'activities'], function () {

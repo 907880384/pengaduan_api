@@ -38,6 +38,8 @@ class Helper {
             'PRODUCT_UPDATE_SUCCESS' => 'Data barang berhasil diperbarui',
             'PRODUCT_CREATE_FAILED' => 'Data barang baru gagal disimpan',
             'PRODUCT_UPDATE_FAILED' => 'Data barang gagal diperbarui',
+            'PRODUCT_NOT_FOUND' => 'Data barang tidak ditemukan',
+            'PRODUCT_DELETE_SUCCESS' => 'Hapus data barang gagal',
         ];
     }
 

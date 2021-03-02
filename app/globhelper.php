@@ -49,6 +49,12 @@ if(!function_exists('routerCollections')) {
             "route" => '/complaints',
             "icon" => "fas fa-comments",
           ],
+          [
+            "to" => "admin",
+            "title" => "Pemesanan",
+            "route" => '/orders',
+            "icon" => "fas fa-shopping-cart",
+          ],
         ], 
       ],
       [

@@ -35,7 +35,8 @@
   <script>
     var urlNotif = "{{ url('mobile_notification') }}"
 
-    window.CLIENT_SOCKET_HOST = "127.0.0.1"; //"192.168.43.168";
+    window.CLIENT_SOCKET_HOST = "192.168.43.168";
+    // window.CLIENT_SOCKET_HOST = "127.0.0.1";
     window.CLIENT_SOCKET_PORT = "8005";
 
     window.globalBroadcast = {

@@ -82,7 +82,7 @@
 @push('scripts')
 <script>
 
-  const urlPagination = "{!! url('/products') !!}"
+  const urlProduct = "{!! url('/products') !!}"
 
   function setDatatable(page) {
     const searchName = $('#searchName').val();
@@ -90,7 +90,7 @@
 
     $.ajax({
       type: "GET",
-      url: urlPagination + '?page=' + page + '&name=' + searchName + '&spesification=' + searchSpesification,
+      url: urlProduct + '?page=' + page + '&name=' + searchName + '&spesification=' + searchSpesification,
       success: function (data) {
         $("#coverTableProduct").html(data);
       }
@@ -115,6 +115,43 @@
     $('#searchSpesification').val('')
     setDatatable(1);
   }
+
+  function deleteRow(id) {
+    const url = urlProduct + "/" + id;
+
+    Swal.fire({
+        title: 'DELETE ROW',
+        text: 'Anda yakin ingin menghapus data ini ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+
+          axios.delete(url).then((response) => {
+            const {data, status} = response;
+            if(status == 200) {
+              Swal.fire({
+                title: 'SUCCESS',
+                text: data.message,
+                confirmButtonText: `OK`,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = urlProduct
+                }
+              })
+            }
+
+
+          }).catch((error) => {
+            console.log(error.response);
+          });
+        }
+      })
+  }
+
 
   $(function () {
     $(document).on('click', '.pagination a',function(event)
