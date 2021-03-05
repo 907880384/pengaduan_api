@@ -70,7 +70,7 @@ class ProductController extends Controller
         $product = Product::create([
             'product_name' => $req->product_name,
             'spesification' => $req->spesification,
-            'stock_awal' => $req->stock,
+            'stock' => $req->stock,
             'satuan' => $req->satuan,
         ]);
 
@@ -150,7 +150,7 @@ class ProductController extends Controller
 
         $product->product_name = $req->product_name;
         $product->spesification = $req->spesification;
-        $product->stock_awal = $req->stock;
+        $product->stock = $req->stock;
         $product->satuan = $req->satuan;
         $product->save();
 

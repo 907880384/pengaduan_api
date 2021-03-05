@@ -17,8 +17,7 @@ class CreateProductsTable extends Migration
             $table->uuid('id')->primary();
             $table->string('product_name')->nullable()->default(null);
             $table->longText('spesification')->nullable()->default(null);
-            $table->unsignedBigInteger('stock_awal')->nullable()->default(0);
-            $table->unsignedBigInteger('stock_akhir')->nullable()->default(0);
+            $table->unsignedBigInteger('stock')->nullable()->default(0);
             $table->string('satuan')->nullable()->default('buah');
             $table->timestamps();
         });

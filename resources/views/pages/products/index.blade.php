@@ -17,11 +17,14 @@
 
   <div class="section-body">
     <h2 class="section-title">List Data Barang</h2>
+
     <div class="row">
       <div class="col-12 col-lg-12 col-md-12">
         <div class="card">
+          <div class="card-heder ml-3 mt-3">
+            <h5 class="card-title">Filter Pencarian</h5>
+          </div>
           <div class="card-body p-1">
-            
             <div class="row m-2">
               <div class="col-md-6">  
                 <div class="form-group row">
@@ -56,25 +59,21 @@
 
               </div>
             </div>
-
-            {{-- DATA TABLE --}}
-            <div class="row">&nbsp;</div>
-
-            <div class="row">
-              <div id="coverTableProduct" class="col-md-12 col-12 col-lg-12">
-                @include('pages.products.datatable')
-              </div>
-            
-            </div>
-            
           </div>
-
-          
-
         </div>
       </div>
-
     </div>
+
+    <div class="row">
+      <div class="col-lg-12 col-sm-12 col-md-12 ">
+        <div class="card">
+          <div id="coverTableProduct" class="card-body">
+            @include('pages.products.datatable')
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>  
 @endsection

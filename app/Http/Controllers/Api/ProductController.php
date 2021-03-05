@@ -9,7 +9,7 @@ use Helper;
 
 class ProductController extends Controller
 {
-    private $page = 10;
+    private $page = 4;
 
     private function sendResponse($msg, $status=200) {
         return response(['message' => $msg], $status);
@@ -18,18 +18,18 @@ class ProductController extends Controller
 
     public function index()
     {
+        $types = request()->query('types');
+        $search = request()->query('search');
+
+
         $products = Product::with(['fileImages']);
 
-        $searchName = request()->query('name');
-        $searchSpesification = request()->query('spesification');
-
-
-        if($searchName && $searchName != '') {
-            $products = $products->where('product_name', 'like', '%'.$searchName.'%');
+        if($types == 'name' && $search != '') {
+            $products = $products->where('product_name', 'like', '%'.$search.'%');
         }
 
-        if($searchSpesification && $searchSpesification != '') {
-            $products = $products->where('spesification', 'like', '%'.$searchSpesification.'%');
+        if($types == 'spesification' && $search != '') {
+            $products = $products->where('spesification', 'like', '%'.$search.'%');
         }
 
         $products = $products->orderBy('updated_at', 'desc')->paginate($this->page);
