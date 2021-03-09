@@ -7,8 +7,7 @@ require('dotenv').config();
 var redisHost = process.env.REDIS_HOST;
 var redisPort = process.env.REDIS_PORT;
 var serverPort = process.env.BROADCAST_PORT;
-var serverHost = '192.168.43.168'; 
-// var serverHost = '127.0.0.1';
+var serverHost = process.env.BROADCAST_HOST;
 var ioRedis = require('ioredis');
 var redis = new ioRedis(redisPort, redisHost);
 
@@ -57,17 +56,13 @@ io.on("connection", function (socket) {
     sourceData.users[userId] = socket.id;
     io.emit("sendDataUserActiveLogin", sourceData.users);
   });
-  
+
   socket.on("disconnect", function () {
     var i = sourceData.users.indexOf(socket.id);
     sourceData.users.splice(i, 1, 0);
     io.emit('sendDataUserActiveLogin', sourceData.users);
   });
 });
-
-// server.listen(serverPort, () => {
-//   console.log(`Socket server is running on port ${serverPort}`);
-// });
 
 
 server.listen(serverPort, serverHost, () => {

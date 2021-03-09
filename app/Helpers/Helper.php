@@ -40,6 +40,10 @@ class Helper {
             'PRODUCT_UPDATE_FAILED' => 'Data barang gagal diperbarui',
             'PRODUCT_NOT_FOUND' => 'Data barang tidak ditemukan',
             'PRODUCT_DELETE_SUCCESS' => 'Hapus data barang gagal',
+
+            'ADD_CART_SUCCESS' => 'Pesanan anda berhasil ditambahkan',
+            'ADD_CART_FAILED' => 'Pesanan anda gagal ditambahkan',
+            'REMOVE_CART_ALL' => 'Seluruh keranjang belanja dihapus'
         ];
     }
 

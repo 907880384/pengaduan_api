@@ -4,12 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cookie;
 use App\Models\Product;
 use Helper;
+use Auth;
 
 class ProductController extends Controller
 {
     private $page = 4;
+
 
     private function sendResponse($msg, $status=200) {
         return response(['message' => $msg], $status);
@@ -65,5 +68,7 @@ class ProductController extends Controller
         return response(['product' => $product], 200); 
 
     }
+
+    
 
 }

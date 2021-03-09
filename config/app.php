@@ -167,6 +167,7 @@ return [
          */
         App\Providers\PermissionsServiceProvider::class,
         Laravel\Passport\PassportServiceProvider::class,
+        Darryldecode\Cart\CartServiceProvider::class,
         // Barryvdh\Cors\ServiceProvider::class,
         /*
          * Application Service Providers...
@@ -229,6 +230,7 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Helper' => App\Helpers\Helper::class,
+        'Cart' => Darryldecode\Cart\Facades\CartFacade::class
     ],
 
 ];
