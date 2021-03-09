@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <title>{{ config('app.name', 'Laravel') }}</title>
+  <title>{{ config('app.name', 'Pengaduan App') }}</title>
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
 
   <link href="{{ asset('css/app.css') }}" rel="stylesheet">
@@ -35,7 +35,7 @@
   <script>
     var urlNotif = "{{ url('mobile_notification') }}"
 
-    window.CLIENT_SOCKET_HOST = "192.168.43.168";
+    window.CLIENT_SOCKET_HOST = "10.110.6.242";
     // window.CLIENT_SOCKET_HOST = "127.0.0.1";
     window.CLIENT_SOCKET_PORT = "8005";
 

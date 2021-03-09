@@ -1,10 +1,10 @@
 <div class="main-sidebar">
   <aside id="sidebar-wrapper">
     <div class="sidebar-brand">
-      <a href="index.html">Pengaduan App</a>
+      <a href="index.html">{{ config('app.name', 'Laravel') }}</a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
-      <a href="index.html">C-App</a>
+      <a href="index.html">APP</a>
     </div>
     <ul class="sidebar-menu">
       @foreach (routerCollections() as $r)
