@@ -18,8 +18,9 @@
                 <thead>
                   <tr class="text-center bg-primary text-white">
                     <th>#</th>
-                    <th>Nama</th>
+                    <th>Nama (Inisial)</th>
                     <th>Slug</th>
+                    <th>Description</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -27,8 +28,9 @@
                   @foreach ($records as $key => $row)
                     <tr>
                       <td class="text-center">{{ $key + $records->firstItem() }}</td>
-                      <td>{{ $row->name }}</td>
+                      <td>{{ ucfirst($row->alias) }}</td>
                       <td>{{ $row->slug }}</td>
+                      <td>{{ $row->name }}</td>
                     </tr>
                   @endforeach
                 </tbody>

@@ -6,6 +6,7 @@ use App\Notifications\NotifikasiComplaint as NotificationComplaint;
 use App\Notifications\AssignedNotif as NotificationAssignedComplaint;
 use App\Notifications\AssignedWorkingComplaint as NotificationAssignedWorkingComplaint;
 use Notification;
+use Cookie;
 
 class Helper {
     
@@ -43,7 +44,11 @@ class Helper {
 
             'ADD_CART_SUCCESS' => 'Pesanan anda berhasil ditambahkan',
             'ADD_CART_FAILED' => 'Pesanan anda gagal ditambahkan',
-            'REMOVE_CART_ALL' => 'Seluruh keranjang belanja dihapus'
+            'REMOVE_CART_ALL' => 'Seluruh keranjang belanja dihapus',
+            'SHOW_CART_EMPTY' => 'Keranjang belanja kosong' ,
+            'SHOW_CART_SUCCCESS' => 'Tersedia keranjang belanja',
+            'CART_NOT_READY' => 'Daftar belanja tidak ditemukan',
+            'UPDATE_CART_FAILED' => 'Ubah daftar belanja gagal'
         ];
     }
 
@@ -68,7 +73,5 @@ class Helper {
                 break;
         }
     }
-
-    
 
 }

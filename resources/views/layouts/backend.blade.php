@@ -15,15 +15,15 @@
   <div id="app">
     <div class="main-wrapper">
       <div class="navbar-bg"></div>
-  
+
       <x-topnav />
       <x-sidenav />
-      
+
       <!-- Main Content -->
       <div class="main-content">
         @yield('content')
       </div>
-  
+
       <x-footer />
     </div>
   </div>
@@ -35,9 +35,8 @@
   <script>
     var urlNotif = "{{ url('mobile_notification') }}"
 
-    window.CLIENT_SOCKET_HOST = "10.110.6.242";
-    // window.CLIENT_SOCKET_HOST = "127.0.0.1";
-    window.CLIENT_SOCKET_PORT = "8005";
+    window.CLIENT_SOCKET_HOST = SOCKET_HOST;
+    window.CLIENT_SOCKET_PORT = SOCKET_PORT;
 
     window.globalBroadcast = {
       event: {
@@ -81,14 +80,14 @@
     }
 
     function showNotification(data, target)
-    { 
+    {
       if(data.length) {
         const url = urlNotif + '/show';
 
         var htmlElements = data.map(function (notification) {
           return makeNotification(notification);
         });
-        
+
         $(target).addClass('beep');
         $(target + 'Menu').html(htmlElements.join(''));
         $(target + 'Footer').html('<a href="' + url + '">View All<i class="fas fa-chevron-right"></i></a>')
@@ -117,7 +116,7 @@
       return to;
     }
 
-    function textNotification(data) 
+    function textNotification(data)
     {
       var text = '';
       text += '<div class="dropdown-item-icon bg-primary text-white">'
@@ -133,17 +132,14 @@
       return text;
     }
 
-    $(function () { 
-      
-      let authUser   = @json(auth()->user());
-      let socketIP   = CLIENT_SOCKET_HOST; //"127.0.0.1";
-      let socketPORT = CLIENT_SOCKET_PORT;
+    $(function () {
 
-      let socket = io(socketIP + ":" + socketPORT);
+      let authUser   = @json(auth()->user());
+      let socket = io(CLIENT_SOCKET_HOST + ":" + CLIENT_SOCKET_PORT);
 
       console.log("AUTH USER", authUser)
       loadNotification(authUser.id);
-    
+
 
       socket.on('connect', () => {
         socket.emit('sendUserLogin', authUser.id);
@@ -153,7 +149,7 @@
         console.log("Now Data Receive", data);
       });
 
-    
+
       socket.on(globalBroadcast.event.complaint.channelName + ":" + globalBroadcast.event.complaint.eventName, (message) => {
         console.log(`${globalBroadcast.event.complaint.channelName}`, message);
         if(authUser.id == message.receiveData) {
@@ -167,9 +163,9 @@
           loadNotification(message.receiveData);
         }
       });
-      
+
       socket.on(globalBroadcast.event.assignedWorkingComplaint.channelName + ":" + globalBroadcast.event.assignedWorkingComplaint.eventName, (message) => {
-        console.log(message);       
+        console.log(message);
         const filters = message.receiveData.filter((item) => item == authUser.id);
         if(filters.length > 0) {
           loadNotification(filters[0]);
@@ -178,7 +174,7 @@
 
 
       socket.on(globalBroadcast.event.finishWorkComplaint.channelName + ":" + globalBroadcast.event.finishWorkComplaint.eventName, (message) => {
-        console.log(message);       
+        console.log(message);
         const filters = message.receiveData.filter((item) => item == authUser.id);
         if(filters.length > 0) {
           loadNotification(filters[0]);

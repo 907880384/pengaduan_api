@@ -62,3 +62,5 @@ mix.js([
     'resources/assets/js/scripts.js',
     'resources/assets/js/custom.js'
 ], 'public/js/app.js').sourceMaps();
+
+mix.webpackConfig({ node: { fs: 'empty' }});

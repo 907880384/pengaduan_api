@@ -61,7 +61,7 @@ class ProductController extends Controller
 
         if(count($product->fileImages) > 0) {
             foreach ($product->fileImages as $file) {
-                $file->filepath = url($file->filepath);
+                $file->filepath = url('storage/'. $file->filepath);
             }
         }
 

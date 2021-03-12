@@ -17,7 +17,7 @@ if(!function_exists('routerCollections')) {
       ],
       [
         "slug" => "admin",
-        "label" => "Master Data",
+        "label" => "Master Pengguna",
         "components" => [
           [
             "to" => "admin",
@@ -31,31 +31,50 @@ if(!function_exists('routerCollections')) {
             "route" => '/roles',
             "icon" => "fas fa-user-tag",
           ],
-          [
-            "to" => "admin",
-            "title" => "Barang",
-            "route" => '/products',
-            "icon" => "fab fa-product-hunt",
-          ],
         ]
       ],
       [
         "slug" => "all",
-        "label" => "Information",
+        "label" => "Master Barang",
+        "components" => [
+          [
+            "to" => "admin",
+            "title" => "Barang Masuk",
+            "route" => '/products',
+            "icon" => "fab fa-product-hunt",
+          ],
+          [
+            "to" => "admin",
+            "title" => "Barang Keluar",
+            "route" => '/orders',
+            "icon" => "fa fa-external-link",
+          ],
+          
+        ]
+      ],
+      [
+        "slug" => "all",
+        "label" => "Info Pengaduan",
         "components" => [
           [
             "to" => "all",
             "title" => "Pengaduan",
             "route" => '/complaints',
             "icon" => "fas fa-comments",
-          ],
-          [
-            "to" => "admin",
-            "title" => "Pemesanan",
-            "route" => '/orders',
-            "icon" => "fas fa-shopping-cart",
-          ],
+          ]
         ], 
+      ],
+      [
+        "slug" => "all",
+        "label" => "Info Tamu", 
+        "components" => [
+          [
+            "to" => "all",
+            "title" => "Buku Tamu",
+            "route" => '/visitors',
+            "icon" => "fas fa-users",
+          ],
+        ],
       ],
       [
         "slug" => "all",
@@ -70,8 +89,8 @@ if(!function_exists('routerCollections')) {
           [
             "to" => "admin",
             "title" => "Logs",
-            "route" => '/roles',
-            "icon" => "fas fa-cogs",
+            "route" => '/logs',
+            "icon" => "fas fa-clipboard-list",
           ],
         ],
       ],

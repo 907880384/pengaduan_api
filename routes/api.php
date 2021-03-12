@@ -46,10 +46,9 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
 
 
         /** Carts */
-        Route::post('carts/add/product', 'CartsController@addToCart');
-        Route::get('carts/remove/all', 'CartsController@removeAllCart');
-        Route::get('carts/delete/product', 'CartsController@deleteCart');
-    
+        Route::post('carts/add', 'CartsController@createCart');
+        Route::get('carts/show/{id}', 'CartsController@showCart');
+        Route::get('carts/remove', 'CartsController@removeCart');
 
         Route::get('/information/complaints', 'InformationController@getComplaintInfo');
 
