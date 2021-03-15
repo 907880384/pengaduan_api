@@ -7,7 +7,7 @@
     <div class="section-header-breadcrumb">
       @if (strtolower(Auth::user()->roles()->first()->slug) == 'admin')
       <div class="breadcrumb-item">
-        <a href="{{ url('/products/create') }}">
+        <a href="{{ url('/products/create') }}" class="btn btn-primary btn-sm">
           Tambah Barang
         </a>
       </div>

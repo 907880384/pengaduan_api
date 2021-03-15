@@ -2,100 +2,103 @@
 
 if(!function_exists('routerCollections')) {
   function routerCollections() {
-    return [
+    return[
+      //Dashboard
       [
-        "slug" => "all",
-        "label" => "Dashboard", 
+        "slug" => [],
+        "label" => "Dashboard",
         "components" => [
           [
-            "to" => "all",
             "title" => "Dashboard",
             "route" => '/dashboard',
             "icon" => "fas fa-fire",
           ]
         ]
       ],
+
+      //Master Pengguna
       [
-        "slug" => "admin",
+        "slug" => ["admin"],
         "label" => "Master Pengguna",
         "components" => [
           [
-            "to" => "admin",
+            "to" => ["admin"],
             "title" => "Pengguna",
             "route" => '/users',
             "icon" => "fas fa-user",
           ],
           [
-            "to" => "admin",
+            "to" => ["admin"],
             "title" => "Role",
             "route" => '/roles',
             "icon" => "fas fa-user-tag",
           ],
         ]
       ],
+
+      //Master Barang
       [
-        "slug" => "all",
+        "slug" => ["admin", "cleaning-service", "teknisi", "security", "pest-control", "gardener"],
         "label" => "Master Barang",
         "components" => [
           [
-            "to" => "admin",
+            "to" => ["admin", "cleaning-service", "teknisi", "security", "pest-control", "gardener"],
             "title" => "Barang Masuk",
             "route" => '/products',
             "icon" => "fab fa-product-hunt",
           ],
           [
-            "to" => "admin",
+            "to" => ["admin"],
             "title" => "Barang Keluar",
             "route" => '/orders',
-            "icon" => "fa fa-external-link",
+            "icon" => "fas fa-external-link-alt",
           ],
-          
         ]
       ],
+
+      //Info Pengaduan
       [
-        "slug" => "all",
+        "slug" => ["admin", "customer", "cleaning-service", "teknisi", "security", "pest-control", "gardener"],
         "label" => "Info Pengaduan",
+        "except" => "receptionis",
         "components" => [
           [
-            "to" => "all",
+            "to" => ["admin", "customer", "cleaning-service", "teknisi", "security", "pest-control", "gardener"],
             "title" => "Pengaduan",
             "route" => '/complaints',
             "icon" => "fas fa-comments",
           ]
         ], 
       ],
+
+      //Info Tamu
       [
-        "slug" => "all",
+        "slug" => ["admin", "receptionis"],
         "label" => "Info Tamu", 
         "components" => [
           [
-            "to" => "all",
+            "to" =>  ["admin", "receptionis"],
             "title" => "Buku Tamu",
             "route" => '/visitors',
             "icon" => "fas fa-users",
           ],
         ],
       ],
+
+      //Pengaturan
       [
-        "slug" => "all",
+        "slug" => ["admin"],
         "label" => "Pengaturan", 
         "components" => [
           [
-            "to" => "all",
-            "title" => "Profile",
-            "route" => '/profile',
-            "icon" => "fas fa-id-card",
-          ],
-          [
-            "to" => "admin",
+            "to" => ["admin"],
             "title" => "Logs",
             "route" => '/logs',
             "icon" => "fas fa-clipboard-list",
           ],
         ],
       ],
-      
-    ];
 
+    ];
   }
 }

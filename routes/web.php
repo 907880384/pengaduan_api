@@ -10,7 +10,6 @@ Route::post('login', 'Web\AuthController@authLogin')->name('login');
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'Web\DashboardController@index')->name('dashboard');
     Route::get('dashboard', 'Web\DashboardController@index')->name('dashboard');
-    Route::get('dashboard/statistic', 'Web\DashboardController@getStatistics');
 
     Route::get('logout', 'Web\AuthController@logout')->name('logout');
 
@@ -71,5 +70,8 @@ Route::group(['middleware' => ['auth']], function () {
         Route::get('/read/{notifId}', 'Web\MobileNotificationController@read');
     });
 
-
+    /** Visitor (Buku Tamu) */
+    Route::resource('visitors', 'Web\VisitorController');
+    Route::get('visitors/exit/{id}', 'Web\VisitorController@exitVisitor');
+    Route::get('list/visitors', 'Web\VisitorController@listVisitors')->name('visitors.list');
 });

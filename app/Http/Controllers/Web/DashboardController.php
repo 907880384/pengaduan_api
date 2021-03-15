@@ -5,26 +5,26 @@ namespace App\Http\Controllers\Web;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Complaint;
+use App\Models\Visitor;
 use App\Models\Role;
 use Auth;
 
 class DashboardController extends Controller
 {
-    public function complaintStatistic() {
-        $roles = Role::where('slug','!=', 'admin')->where('slug', '!=', 'pegawai')->get();
-        $results = [];
+    public function complaintStatistic($dates) {
 
-        foreach ($roles as $role) {
-            $data = [
-                'name' => $role->name,
-                'new' => $this->queryComplaint($role->id)->where('is_assigned', false)->count(),
-                'wait' =>$this->queryComplaint($role->id)->where('is_assigned', true)->where('is_finished', false)->count(),
-                'finish' => $this->queryComplaint($role->id)->where('is_finished', true)->count() ,
-                'total' => $this->queryComplaint($role->id)->count(),
-            ];
+        $user = Auth::user();
 
-            $results[] = $data;
-        }
+        $results = [
+            "new_complaint" => $this->queryComplaint($user)->where('is_finished', false)->whereDate('created_at', '=', $dates)->count(),
+            "finish_complaint" => $this->queryComplaint($user)->where('is_finished', true)->whereDate('created_at', '=', $dates)->count(),
+            "total_complaint" => $this->queryComplaint($user)->whereDate('created_at', '=', $dates)->count(),
+
+            "visitor_come" => Visitor::where('selesai', false)->whereDate('created_at', '=', $dates)->count(),
+            "visitor_exit" => Visitor::where('selesai', true)->whereDate('created_at', '=', $dates)->count(),
+            "total_visitor" => Visitor::whereDate('created_at', '=', $dates)->count(),
+        ];
+
 
         return $results;
     }   
@@ -32,7 +32,9 @@ class DashboardController extends Controller
 
     public function index() 
     {
-        $results = $this->complaintStatistic();
+        $dates = request()->has('dates') ? \Carbon\Carbon::parse(request()->get('dates'))->format('Y-m-d') : \Carbon\Carbon::today()->format('Y-m-d');
+
+        $results = $this->complaintStatistic($dates);
 
         if(request()->ajax()) {
             return view('pages.dashboard.badge_statistic', compact('results'));
@@ -46,16 +48,18 @@ class DashboardController extends Controller
         return response()->json(['result' => $results]);
     }
 
-    public function queryComplaint($roleId) {
-        $complaint = Complaint::where('type_id', $roleId);
-
-        if(Auth::user()->roles()->first()->slug == 'pegawai') {
-            $complaint->where('sender_id', Auth::user()->id);
+    private function queryComplaint($user) {
+        $slug = strtolower($user->roles()->first()->slug);
+        
+        if($slug != 'admin' && $slug != 'customer') {
+            return Complaint::where('type_id', $user->roles()->first()->id);
+        }
+        
+        if($slug == 'customer') {
+            return Complaint::where('sender_id', $user->id);    
         }
 
-        return $complaint;
+        return Complaint::with(['sender']);
     }
-
-
     
 }

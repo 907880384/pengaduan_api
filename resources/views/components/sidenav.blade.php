@@ -8,20 +8,28 @@
     </div>
     <ul class="sidebar-menu">
       @foreach (routerCollections() as $r)
-        @if (strtolower($r['slug']) == 'all')
-          <li class="menu-header">
-            {{ $r['label'] }}
-          </li>
-          @foreach ($r['components'] as $c)
-            @if (strtolower($c['to']) == 'all')
-              <li class="nav-item dropdown">
-                <a href="{{ url($c['route']) }}" class="nav-link">
-                  <i class="{{ $c['icon'] }}"></i>
-                  <span>{{ $c['title'] }}</span>
-                </a>
-              </li>
-            @else
-              @if (strtolower($c['to']) == Auth::user()->roles()->first()->slug)
+
+        @if (count($r['slug']) > 0)
+          
+          @if (in_array(Auth::user()->roles()->first()->slug, $r['slug']))
+            <li class="menu-header">
+              {{ $r['label'] }}
+            </li>
+
+            <!-- Count Route > 0 -->
+            @foreach ($r['components'] as $c)
+              @if (count($c['to']) > 0)
+                
+                @if (in_array(Auth::user()->roles()->first()->slug, $c['to']))
+                  <li class="nav-item dropdown">
+                    <a href="{{ url($c['route']) }}" class="nav-link">
+                      <i class="{{ $c['icon'] }}"></i>
+                      <span>{{ $c['title'] }}</span>
+                    </a>
+                  </li>
+                @endif
+
+              @else
                 <li class="nav-item dropdown">
                   <a href="{{ url($c['route']) }}" class="nav-link">
                     <i class="{{ $c['icon'] }}"></i>
@@ -29,23 +37,25 @@
                   </a>
                 </li>
               @endif
-            @endif
-          @endforeach
+            @endforeach
+          @endif
+
         @else
           <li class="menu-header">
             {{ $r['label'] }}
           </li>
-          @if (strtolower($r['slug']) == Auth::user()->roles()->first()->slug)
-            @foreach ($r['components'] as $c)
-              <li class="nav-item dropdown">
-                <a href="{{ url($c['route']) }}" class="nav-link">
-                  <i class="{{ $c['icon'] }}"></i>
-                  <span>{{ $c['title'] }}</span>
-                </a>
-              </li>
-            @endforeach
-          @endif
+
+          @foreach ($r['components'] as $c)
+            <li class="nav-item dropdown">
+              <a href="{{ url($c['route']) }}" class="nav-link">
+                <i class="{{ $c['icon'] }}"></i>
+                <span>{{ $c['title'] }}</span>
+              </a>
+            </li>
+          @endforeach
         @endif
+
+        
 
       @endforeach
       </ul>

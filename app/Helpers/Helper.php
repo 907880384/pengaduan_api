@@ -48,7 +48,12 @@ class Helper {
             'SHOW_CART_EMPTY' => 'Keranjang belanja kosong' ,
             'SHOW_CART_SUCCCESS' => 'Tersedia keranjang belanja',
             'CART_NOT_READY' => 'Daftar belanja tidak ditemukan',
-            'UPDATE_CART_FAILED' => 'Ubah daftar belanja gagal'
+            'UPDATE_CART_FAILED' => 'Ubah daftar belanja gagal',
+
+
+            'CREATE_VISITOR_FAILED' => 'Gagal menambahkan tamu',
+            'CREATE_VISITOR_SUCCESS' => 'Data tamu berhasil di simpan',
+            'EXITED_VISITOR_SUCCESS' => 'Tamu telah selesai'
         ];
     }
 
@@ -72,6 +77,11 @@ class Helper {
             default:
                 break;
         }
+    }
+
+    public static function convertWebcameImage($image) {
+        $image = str_replace('data:image/jpeg;base64,','', $image);
+        return base64_decode($image);
     }
 
 }

@@ -67,6 +67,7 @@
     },
     "dependencies": {
         "dotenv": "^8.2.0",
+        "gijgo": "^1.9.13",
         "ioredis": "^4.17.3",
         "redis-server": "^1.2.2",
         "socket.io": "^2.3.0",

@@ -6,10 +6,9 @@
     <h1>Master Pengguna</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="{{ url('users') }}">List Pengguna</a>
-      </div>
-      <div class="breadcrumb-item">
-        <a href="{{ url('users/create') }}">Tambah Pengguna</a>
+        <a href="{{ url('users/create') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus"></i> TAMBAH PENGGUNA
+        </a>
       </div>
     </div>
   </div>
@@ -26,9 +25,11 @@
                   <label for="filterRole" class="col-md-3 m-2">Kategori Role</label>
                   <div class="col-md-8">
                     <select id="filterRole" name="filterRole" class="form-control-sm form-control">
-                      <option value="">Pilih Kategori Role</option>
+                      <option value="">Pilih Role Akses</option>
                       @foreach ($roles as $role)
-                        <option value="{{ $role->id }}">{{ Str::ucfirst($role->name) }}</option>
+                        <option value="{{ $role->id }}">
+                          {{ $role->fullslug }}
+                        </option>
                       @endforeach
                     </select>
                   </div>
@@ -67,9 +68,6 @@
             </div>
             
           </div>
-
-          
-
         </div>
       </div>
 

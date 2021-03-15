@@ -4,7 +4,7 @@
       <tr class="text-center bg-primary text-white">
         <th>#</th>
         <th>Nama</th>
-        <th>Unique ID/Username</th>
+        <th>Username</th>
         <th>Roles</th>
         <th>Action</th>
       </tr>
@@ -16,10 +16,12 @@
           <td class="text-center">{{ $key + $records->firstItem() }}</td>
           <td>{{ $row->name }}</td>
           <td>{{ $row->username }}</td>
-          <td class="text-center">{{ $row->roles()->first()->name }}</td>
           <td class="text-center">
-            <button type="button" class="btn btn-danger" onclick="deleteRow('{{ $row->id }}')">
-              <i class="fas fa-trash"></i> Delete
+            {{ implode(' ', array_map('ucfirst', explode('-', $row->roles()->first()->slug))) }}
+          </td>
+          <td class="text-center">
+            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow('{{ $row->id }}')">
+              <i class="fas fa-trash"></i> HAPUS
             </button>
           </td>
         </tr>

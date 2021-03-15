@@ -11,9 +11,22 @@ class UsersController extends Controller
 {
     private $page = 10;
 
+    private function getRoles() {
+        $roles = Role::where('slug', '!=', 'admin')->get();
+        $roles->transform(function($query) {
+            $query->fullslug = implode(
+                ' ', 
+                array_map('ucfirst', explode('-', $query->slug))
+            );
+            return $query;
+        });
+        return $roles;
+    }
+
     public function index()
     {
-        $roles = Role::where('slug', '!=', 'admin')->where('slug', '!=', 'pegawai')->get();
+        $roles = $this->getRoles();
+        
         $records = User::with('roles');
 
         if(request()->query('filterRole') != null) {
@@ -38,8 +51,6 @@ class UsersController extends Controller
         return view('pages.users.index', compact('records', 'roles'));
     }
 
-
-
     public function show($id)
     {
         $user = User::with(['usersComplaint'])->get();
@@ -52,7 +63,7 @@ class UsersController extends Controller
 
     public function create()
     {
-        $roles = Role::where('id', '!=', 1)->get();
+        $roles = $this->getRoles();  
         return view('pages.users.create', compact('roles'));
     }
 

@@ -6,7 +6,9 @@
     <h1>Form Pengguna</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="{{ url('users') }}">List Pengguna</a>
+        <a href="{{ url('users') }}" class="btn btn-success btn-sm">
+          <i class="fas fa-clipboard-list"></i> LIST PENGGUNA
+        </a>
       </div>
     </div>
   </div>
@@ -46,13 +48,13 @@
                 </div>
     
                 <div class="form-group row">
-                  <label for="role_id" class="col-sm-4 col-form-label">Jabatan / Role </label>
+                  <label for="role_id" class="col-sm-4 col-form-label">Role Akses</label>
                   <div class="col-sm-8">
                     <select name="role_id" id="role_id" class="form-control select2">
-                      <option value="-">Pilih Posisi/Role/Jabatan</option>
+                      <option value="-">Pilih Role Akses</option>
                       @foreach ($roles as $r)
                           <option value="{{ $r->id }}">
-                            {{ $r->name }}
+                            {{ $r->fullslug }}
                           </option>
                       @endforeach
                     </select>

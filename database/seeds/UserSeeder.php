@@ -17,68 +17,68 @@ class UserSeeder extends Seeder
                 'role' => 'admin'
             ],
 
-            // //Employees
-            // [
-            //     'name' => 'Razor Colombias', 
-            //     'username' => 'razor', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'pegawai'
-            // ],
-            // [
-            //     'name' => 'Risco Arizona', 
-            //     'username' => 'rn', 
-            //     'password' => bcrypt('12'),
-            //     'role' => 'pegawai'
-            // ],
-            // [
-            //     'name' => 'John Doe', 
-            //     'username' => 'johndoe', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'pegawai'
-            // ],
+            //Employees
+            [
+                'name' => 'Reyna Clarissa', 
+                'username' => 'reyna', 
+                'password' => bcrypt('12345678'),
+                'role' => 'receptionis'
+            ],
+            [
+                'name' => 'Razor Colombias', 
+                'username' => 'razor', 
+                'password' => bcrypt('12345678'),
+                'role' => 'customer'
+            ],
+            [
+                'name' => 'Risco Arizona', 
+                'username' => 'rn', 
+                'password' => bcrypt('12'),
+                'role' => 'customer'
+            ],
 
-            // //Technicians
-            // [
-            //     'name' => 'Anton', 
-            //     'username' => 'anton', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'teknisi'
-            // ],
-            // [
-            //     'name' => 'Ardi Wijaya', 
-            //     'username' => 'ardi', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'teknisi'
-            // ],
+            //Technicians
+            [
+                'name' => 'Anton', 
+                'username' => 'anton', 
+                'password' => bcrypt('12345678'),
+                'role' => 'teknisi'
+            ],
+            [
+                'name' => 'Ardi Wijaya', 
+                'username' => 'ardi', 
+                'password' => bcrypt('12345678'),
+                'role' => 'teknisi'
+            ],
 
-            // //Cleaning Services
-            // [
-            //     'name' => 'Moria Anita', 
-            //     'username' => 'moria', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'cleaning-service'
-            // ],
-            // [
-            //     'name' => 'Rona Sena', 
-            //     'username' => 'rona', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'cleaning-service'
-            // ],
+            //Cleaning Services
+            [
+                'name' => 'Moria Anita', 
+                'username' => 'moria', 
+                'password' => bcrypt('12345678'),
+                'role' => 'cleaning-service'
+            ],
+            [
+                'name' => 'Rona Sena', 
+                'username' => 'rona', 
+                'password' => bcrypt('12345678'),
+                'role' => 'cleaning-service'
+            ],
 
 
-            // //Other Support
-            // [
-            //     'name' => 'Afdan Roy', 
-            //     'username' => 'afdan', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'security'
-            // ],
-            // [
-            //     'name' => 'Sumarwan', 
-            //     'username' => 'sumarwan', 
-            //     'password' => bcrypt('12345678'),
-            //     'role' => 'security'
-            // ],
+            //Other Support
+            [
+                'name' => 'Afdan Roy', 
+                'username' => 'afdan', 
+                'password' => bcrypt('12345678'),
+                'role' => 'security'
+            ],
+            [
+                'name' => 'Sumarwan', 
+                'username' => 'sumarwan', 
+                'password' => bcrypt('12345678'),
+                'role' => 'security'
+            ],
 
         ]);
     }
