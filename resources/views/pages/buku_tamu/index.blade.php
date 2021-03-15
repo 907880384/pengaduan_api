@@ -97,7 +97,7 @@
       destroy: true,
       ordering: false,
       ajax: {
-        "url": "{{ route('visitors.list') }}",
+        "url": "{{ route('list.visitors') }}",
         "data": function (d) {
           console.log("Filter", filter);
 

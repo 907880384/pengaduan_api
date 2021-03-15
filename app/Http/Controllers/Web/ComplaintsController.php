@@ -14,6 +14,7 @@ use App\Events\ComplaintsEvent;
 use App\Events\AssignedComplaintEvent;
 use App\Events\AssignedWorkingComplaintEvent;
 use Helper;
+use DataTables;
 
 class ComplaintsController extends Controller
 {
@@ -25,12 +26,6 @@ class ComplaintsController extends Controller
 
     public function index()
     {
-        $user = Auth::user();
-
-        if(!$user) {
-            return abort(404);
-        }
-
         $activities = [
             ['type' => 'all', 'value' => 'Seluruh Aktivitas'],
             ['type' => 'not_assigned', 'value' => 'Belum Ditugaskan'],
@@ -38,19 +33,29 @@ class ComplaintsController extends Controller
             ['type' => 'finished', 'value' => 'Pekerjaan Selesai']
         ];
 
+        return view('pages.complaints.index', compact('activities'));
+    }
+
+    public function listComplaints(Request $req) {
+        $user = Auth::user();
         $slug = strtolower($user->roles()->first()->slug);
-        $records = Complaint::with(['sender', 'assigned', 'logs', 'types']);
+        $records = Complaint::with([
+            'sender', 
+            'assigned', 
+            'logs', 
+            'types'
+        ]);
+
         $search = '';
         $sentences = 'all';
 
-        if(request()->query('search') != null) {
-            $search = request()->query('search');
+        if($req->query('search') != null) {
+            $search = $req->query('search');
         }
 
-        if(request()->query('sentences') != null) {
-            $sentences = request()->query('sentences');    
+        if($req->query('sentences') != null) {
+            $sentences = $req->query('sentences');    
         }
-
 
         if($sentences) {
             switch ($sentences) {
@@ -69,36 +74,44 @@ class ComplaintsController extends Controller
             }
         }
 
-        if($slug === 'pegawai') {
+        if($slug == 'customer') {
             $records = $records->where('sender_id', $user->id);
         }
         
-        if($slug != 'admin' && $slug != 'pegawai') {
+        if($slug != 'admin' && $slug != 'customer') {
             $records = $records->whereHas('assigned', function($q) use($user) {
                 $q->where('executor_id', $user->id);
             });
         }
 
-        if($search != '') {
-            $records = $records->where('title', 'like', '%'.$search.'%');
-        }
+        $records = $records->orderBy('updated_at', 'desc')->get();
 
-        $records = $records->orderBy('updated_at', 'desc')->paginate($this->page);
+        return Datatables::of($records)->addIndexColumn()
+            ->addColumn('types_name', function($row) {
+                return $row->types != null ? $row->types->name : "MENUNGGU";
+            })
+            ->addColumn('executor_name', function($row) {
+                return $row->executor != null ? $row->executor->name : "";
+            })
+            ->addColumn('sender_name', function($row) {
+                return $row->sender != null ? $row->sender->name : "";
+            })
+            ->addColumn('action', function($row) use($user) {
+                $str = '';
 
-        $records->data = $records->getCollection()->transform(function($query) {
-            if($query->assigned != null) {
-                $query->executor = \App\User::find($query->assigned->executor_id);
-            }
-            return $query;
-        });     
-        
-        
-        if(request()->ajax()) {
-            return view('pages.complaints.complaint_pagination', compact('records'));
-        }
+                $str .= '<a href="'.url('complaints/show/detail/' . $row->id).'" class="btn btn-sm btn-info"><i class="fas fa-eye"></i> DETAIL </a>';
+                
+                if(strtolower($user->roles()->first()->slug) == 'admin') {
+                    if(!$row->is_assigned && !$row->is_finished) {
+                        $str .= '&nbsp;<button class="btn btn-primary btn-sm" onclick="showAssignModal(\'' . $row->id . '\',\'' . $row->type_id . '\')"><i class="fas fa-tag"></i> TUGASKAN</button>';
+                    }
+                }
 
-        return view('pages.complaints.index', compact('records', 'activities'));
+                return $str;
+            })->rawColumns(['action'])->make(true);
+
     }
+
 
     public function create() {
         $roles = Role::where('id', '!=', 1)->where('id', '!=', 2)->get();
@@ -149,21 +162,21 @@ class ComplaintsController extends Controller
             Auth::user()->roles()->first()->slug
         );
 
-        if($slug != 'pegawai') {
+        if($slug != 'customer') {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
         $req->validate([
-            'title' => 'required|string',
+            // 'title' => 'required|string',
             'messages' => 'required',
-            'is_urgent' => 'required',
+            // 'is_urgent' => 'required',
             'type_id' => 'required',
         ]);
 
         $complaint = Complaint::create([
-            'title' => $req->title,
+            // 'title' => $req->title,
             'messages' => $req->messages,
-            'is_urgent' => $req->is_urgent,
+            // 'is_urgent' => $req->is_urgent,
             'sender_id' => Auth::user()->id,
             'type_id' => $req->type_id
         ]);
@@ -246,7 +259,7 @@ class ComplaintsController extends Controller
     {
         $slug = strtolower(Auth::user()->roles()->first()->slug);
 
-        if($slug === 'admin' || $slug === 'pegawai') {
+        if($slug === 'admin' || $slug === 'customer') {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
@@ -294,7 +307,7 @@ class ComplaintsController extends Controller
     {
         $slug = strtolower(Auth::user()->roles()->first()->slug);
 
-        if($slug != 'pegawai' && $slug != 'admin') {
+        if($slug != 'customer' && $slug != 'admin') {
             $complaint = Complaint::with([
                 'typeComplaint',
                 'complainer',

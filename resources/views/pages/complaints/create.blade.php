@@ -6,7 +6,9 @@
     <h1>Form Pengaduan</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="{{ url('complaints') }}">Data Pengaduan</a>
+        <a href="{{ url('complaints') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-clipboard-list"></i> LIST PENGADUAN
+        </a>
       </div>
     </div>
   </div>
@@ -37,25 +39,25 @@
                   </div>
                 </div>
 
-                <div class="form-group row">
+                {{-- <div class="form-group row">
                   <label for="titleComplaint" class="col-sm-4 col-form-label">
-                    Perihal (Judul)
+                    Uraian (Judul)
                   </label>
                   <div class="col-sm-8">
                     <input type="text" name="titleComplaint" id="titleComplaint" class="form-control" />
                   </div>
-                </div>
+                </div> --}}
 
                 <div class="form-group row">
                   <label for="messageComplaint" class="col-sm-4 col-form-label">
-                    Pesan / Kendala
+                    Uraian Pengaduan
                   </label>
                   <div class="col-sm-8">
-                    <textarea id="messageComplaint" class="form-control" rows="10" cols="30"></textarea>
+                    <textarea id="messageComplaint" class="form-control form-control-sm" rows="10" cols="30"></textarea>
                   </div>
                 </div>
 
-                <div class="form-group row">
+                {{-- <div class="form-group row">
                   <label class="col-sm-4 col-form-label">
                     Mode Pengaduan
                   </label>
@@ -66,7 +68,7 @@
                     </div>
                       
                   </div>
-                </div>
+                </div> --}}
     
                 <div class="form-group row">
                   <div class="col-sm-8 offset-sm-4">
@@ -94,9 +96,9 @@
 
     function sendComplaint() {
       const data = {
-        title: $('#titleComplaint').val(),
+        // title: $('#titleComplaint').val(),
         messages: $('#messageComplaint').val(),
-        is_urgent: $('input[name="selectMode"]:checked').val() == 'urgent' ? true : false,
+        // is_urgent: $('input[name="selectMode"]:checked').val() == 'urgent' ? true : false,
         type_id: $('#selectAssignTo').val()
       }
       

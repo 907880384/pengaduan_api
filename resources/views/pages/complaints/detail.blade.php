@@ -6,7 +6,9 @@
     <h1>Detail Pengaduan</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="{{ url('/complaints') }}">Kembali</a>
+        <a href="{{ url('/complaints') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-arrow-circle-left"></i> Kembali
+        </a>
       </div>
     </div>
   </div>
@@ -20,13 +22,13 @@
             
 
             <div class="author-box-details">
-              <div class="author-box-name">
+              {{-- <div class="author-box-name">
                 <a href="#">{{ $record->title }}</a>
               </div>
 
               <div class="author-box-job">
                 {!! $record->is_urgent ? '<span class="text-success">Perihal Penting</span>' : 'Perihal Biasa' !!}
-              </div>
+              </div> --}}
 
               <div class="author-box-description">
                 <p>{{ $record->messages }}</p>
@@ -34,7 +36,7 @@
 
               <div class="mb-2 mt-3">
                 <div class="text-small text-info font-weight-bold">
-                  {{ 'Tujuan ' . $record->types->name }}
+                  {{  $record->types->name }}
                 </div>
               </div>
             </div>

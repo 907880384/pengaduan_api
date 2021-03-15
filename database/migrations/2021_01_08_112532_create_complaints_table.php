@@ -15,9 +15,9 @@ class CreateComplaintsTable extends Migration
     {
         Schema::create('complaints', function (Blueprint $table) {
             $table->id();
-            $table->text('title')->nullable()->default(null);
+            // $table->text('title')->nullable()->default(null);
             $table->longText('messages')->nullable()->default(null);
-            $table->boolean('is_urgent')->nullable()->default(false);
+            // $table->boolean('is_urgent')->nullable()->default(false);
             $table->boolean('is_finished')->nullable()->default(false);
             $table->boolean('is_assigned')->nullable()->default(false);
             $table->unsignedBigInteger('sender_id')->nullable()->default(null);

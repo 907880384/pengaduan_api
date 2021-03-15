@@ -5,9 +5,11 @@
   <div class="section-header">
     <h1>Informasi Pengaduan</h1>
     <div class="section-header-breadcrumb">
-      @if (strtolower(Auth::user()->roles()->first()->slug) == 'pegawai')
+      @if (strtolower(Auth::user()->roles()->first()->slug) == 'customer')
       <div class="breadcrumb-item">
-        <a href="{{ url('/complaints/create') }}">Tambah Pengaduan</a>
+        <a href="{{ url('/complaints/create') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-plus"></i> Tambah Pengaduan
+        </a>
       </div>
       @endif
     </div>
@@ -15,17 +17,21 @@
 
   <div class="section-body">
     <h2 class="section-title">List Data Pengaduan</h2>
+
     <div class="row">
       <div class="col-12 col-lg-12 col-md-12">
+    
         <div class="card">
           <div class="card-body p-1">
             
             <div class="row m-2">
               <div class="col-md-6">
                 <div class="form-group row">
-                  <label for="sentences" class="col-md-3 m-2">Aktivitas</label>
+                  <label for="sentences" class="col-md-3 m-2">
+                    Aktivitas
+                  </label>
                   <div class="col-md-8">
-                    <select id="sentences" name="sentences" class="form-control-sm form-control">
+                    <select id="sentences" name="sentences" class="form-control form-control-sm">
                       @foreach ($activities as $item)
                         <option value="{{ $item['type'] }}">{{ Str::ucfirst($item['value']) }}</option>
                       @endforeach
@@ -36,41 +42,36 @@
 
               <div class="col-md-6">
                 <div class="form-group row">
-                  <label for="search" class="col-md-3 m-1">Pencarian</label>
-                  <div class="col-md-5 m-0">
+                  <label for="search" class="col-md-3 m-2">Pencarian</label>
+                  <div class="col-md-8">
                     <input type="text" id="search" class="form-control" /> 
-                  </div>
-                  <div class="col-md-3">
-                    <button type="button" class="btn btn-secondary">
-                      <i class="fa fa-search"></i> Cari
-                    </button>
                   </div>
                 </div>
               </div>
 
-            </div>
+              <div class="col-md-6">
+                <div class="form-group row">
+                  <div class="col-md-8 offset-md-4 m-2">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="filterDatatable()">
+                      <i class="fa fa-filter"></i> Filter
+                    </button>
 
-            <div class="row m-2">
-              <div class="col-md-12">
-                <button type="button" class="btn btn-success btn-sm" onclick="refreshDatatable()">
-                  <i class="fa fa-spinner"></i> Refresh
-                </button>
+                    <button type="button" class="btn btn-success btn-sm" onclick="refreshDatatable()">
+                      <i class="fa fa-spinner"></i> Refresh
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
             {{-- DATA TABLE --}}
             <div class="row">&nbsp;</div>
 
-            <div class="row">
-              <div id="tableComplaint" class="col-md-12 col-12 col-lg-12">
-                @include('pages.complaints.complaint_pagination')
-              </div>
+            <div class="row p-3">
+              @include('pages.complaints.complaint_pagination')
             </div>
             
           </div>
-
-          
-
         </div>
       </div>
 
@@ -128,6 +129,59 @@
     const urlAssigned = "{{ url('/assigned/complaints') }}";
     const urlPagination = "{!! url('/complaints') !!}"
 
+    function setDatatable(tableName, filter = null) {
+      tableName = '#' + tableName;
+
+      if($.fn.DataTable.isDataTable(tableName) ) {
+        $(tableName).DataTable().destroy();
+      }
+
+      var table = $(tableName).DataTable({
+      processing: true,
+      serverSide: true,
+      searching: false,
+      destroy: true,
+      ordering: false,
+      ajax: {
+        "url": "{{ route('list.complaints') }}",
+        "data": function (d) {
+
+          console.log("Filter", filter);
+
+          if(filter == null) {
+            d.search = null;
+            d.sentences = null;
+          }
+          else {            
+            d.search = filter.search;
+            d.sentences = filter.sentences;
+          }
+        }   
+      },
+      columns: [
+        {data: 'DT_RowIndex',  name: 'DT_RowIndex', className: 'text-center'},
+        {data: 'messages', name: 'messages'},
+        {
+          data: 'is_finished', 
+          name: 'is_finished', 
+          render: function(data) {
+            if (data)
+              return '<div class="badge badge-primary">SELESAI</div>';
+            else {
+              return '<div class="badge badge-secondary">BELUM SELESAI</div>';
+            }
+          }
+        },
+        {data: 'sender_name', name: 'sender_name'},
+        {data: 'types_name', name: 'types_name'},
+        {data: 'executor_name', name: 'executor_name'},
+        {data: 'action', name: 'action'}
+      ],
+      "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+    });
+
+    }
+
     function setSelect2(data, select, option = null) {
       let records = [];
       $.each(data, function (i, v) {
@@ -150,6 +204,7 @@
     }
 
     function showAssignModal(id, role_id) {
+      console.log("Role ID", role_id);
       $("#modalAssign").modal('show');
       $("#buttonAssign").attr('data-id', id);
 
@@ -165,25 +220,22 @@
     }
 
     function filterDatatable(page) {
-      const sentences = $('#sentences').val();
-      const search = $('#search').val();
-
-      $.ajax({
-        type: "GET",
-        url: urlPagination + '?page=' + page + '&sentences=' + sentences + '&search=' + search,
-        success: function (data) {  
-          $("#tableComplaint").html(data);
-        }
+      setDatatable('complaintTable', {
+        sentences: $('#sentences').val(),
+        search: $('#search').val(),
       });
     }
 
     function refreshDatatable() {
       $('select[name="sentences"]').val('all');
       $("#search").val('')
-      filterDatatable(1);
+      setDatatable('complaintTable')
     }
 
     $(function () {
+
+      setDatatable('complaintTable')
+
 
       $("#buttonAssign").click(function (e) { 
         e.preventDefault();
@@ -212,32 +264,6 @@
         }).catch((err) => {
           console.log(err.response);
         })
-      });
-
-
-      $("#sentences").change(function (e) { 
-        e.preventDefault();
-        var hrefs = $('.pagination a').attr('href');
-        var page = 1;
-
-        if(hrefs != '#' && hrefs != '') {
-          page = parseInt(hrefs.split('page=')[1]);
-        }
-
-        filterDatatable(page)
-      });
-
-      $(document).on('click', '.pagination a',function(e)
-      {
-        e.preventDefault();
-        var hrefPage = $(this).attr('href');
-        var page = 1;
-
-        if(hrefPage != '#' && hrefPage != '') {
-          page = parseInt($(this).attr('href').split('page=')[1]);
-        }
-
-        filterDatatable(page)
       });
 
     });

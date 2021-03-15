@@ -73,5 +73,11 @@ Route::group(['middleware' => ['auth']], function () {
     /** Visitor (Buku Tamu) */
     Route::resource('visitors', 'Web\VisitorController');
     Route::get('visitors/exit/{id}', 'Web\VisitorController@exitVisitor');
-    Route::get('list/visitors', 'Web\VisitorController@listVisitors')->name('visitors.list');
+
+
+
+
+    /** Datatable */
+    Route::get('list/complaints', 'Web\ComplaintsController@listComplaints')->name('list.complaints');
+    Route::get('list/visitors', 'Web\VisitorController@listVisitors')->name('list.visitors');
 });
