@@ -11,88 +11,88 @@ class UserSeeder extends Seeder
     private function users() {
         return collect([
             [
-                'name' => 'Administrator', 
-                'username' => 'admin', 
+                'name' => 'Administrator',
+                'username' => 'admin',
                 'password' => bcrypt('12345678'),
                 'role' => 'admin'
             ],
 
             //Employees
             [
-                'name' => 'Reyna Clarissa', 
-                'username' => 'reyna', 
+                'name' => 'Susanti Shanty',
+                'username' => 'resepsionis',
                 'password' => bcrypt('12345678'),
                 'role' => 'receptionis'
             ],
-            [
-                'name' => 'Razor Colombias', 
-                'username' => 'razor', 
-                'password' => bcrypt('12345678'),
-                'role' => 'customer'
-            ],
-            [
-                'name' => 'Risco Arizona', 
-                'username' => 'rn', 
-                'password' => bcrypt('12'),
-                'role' => 'customer'
-            ],
+            // [
+            //     'name' => 'Razor Colombias',
+            //     'username' => 'razor',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'customer'
+            // ],
+            // [
+            //     'name' => 'Risco Arizona',
+            //     'username' => 'rn',
+            //     'password' => bcrypt('12'),
+            //     'role' => 'customer'
+            // ],
 
-            //Technicians
-            [
-                'name' => 'Anton', 
-                'username' => 'anton', 
-                'password' => bcrypt('12345678'),
-                'role' => 'teknisi'
-            ],
-            [
-                'name' => 'Ardi Wijaya', 
-                'username' => 'ardi', 
-                'password' => bcrypt('12345678'),
-                'role' => 'teknisi'
-            ],
+            // //Technicians
+            // [
+            //     'name' => 'Anton',
+            //     'username' => 'anton',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'teknisi'
+            // ],
+            // [
+            //     'name' => 'Ardi Wijaya',
+            //     'username' => 'ardi',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'teknisi'
+            // ],
 
-            //Cleaning Services
-            [
-                'name' => 'Moria Anita', 
-                'username' => 'moria', 
-                'password' => bcrypt('12345678'),
-                'role' => 'cleaning-service'
-            ],
-            [
-                'name' => 'Rona Sena', 
-                'username' => 'rona', 
-                'password' => bcrypt('12345678'),
-                'role' => 'cleaning-service'
-            ],
+            // //Cleaning Services
+            // [
+            //     'name' => 'Moria Anita',
+            //     'username' => 'moria',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'cleaning-service'
+            // ],
+            // [
+            //     'name' => 'Rona Sena',
+            //     'username' => 'rona',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'cleaning-service'
+            // ],
 
 
-            //Other Support
-            [
-                'name' => 'Afdan Roy', 
-                'username' => 'afdan', 
-                'password' => bcrypt('12345678'),
-                'role' => 'security'
-            ],
-            [
-                'name' => 'Sumarwan', 
-                'username' => 'sumarwan', 
-                'password' => bcrypt('12345678'),
-                'role' => 'security'
-            ],
+            // //Other Support
+            // [
+            //     'name' => 'Afdan Roy',
+            //     'username' => 'afdan',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'security'
+            // ],
+            // [
+            //     'name' => 'Sumarwan',
+            //     'username' => 'sumarwan',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'security'
+            // ],
 
-            //Gardener
-            [
-                'name' => 'Franco Aledry', 
-                'username' => 'franco', 
-                'password' => bcrypt('12345678'),
-                'role' => 'gardener'
-            ],
-            [
-                'name' => 'Sylviana Horiza', 
-                'username' => 'sylviana', 
-                'password' => bcrypt('12345678'),
-                'role' => 'gardener'
-            ],
+            // //Gardener
+            // [
+            //     'name' => 'Franco Aledry',
+            //     'username' => 'franco',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'gardener'
+            // ],
+            // [
+            //     'name' => 'Sylviana Horiza',
+            //     'username' => 'sylviana',
+            //     'password' => bcrypt('12345678'),
+            //     'role' => 'gardener'
+            // ],
         ]);
     }
 
@@ -105,8 +105,8 @@ class UserSeeder extends Seeder
     {
         $this->users()->each(function($value) {
             $user = User::create([
-                'name' => $value['name'], 
-                'username' => $value['username'], 
+                'name' => $value['name'],
+                'username' => $value['username'],
                 'password' => $value['password'],
             ]);
             $user->roles()->attach(Role::where('slug',$value['role'])->first());
