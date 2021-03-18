@@ -16,7 +16,8 @@ class Visitor extends Model
         'selesai',
         'time_masuk',
         'time_keluar',
-        'user_id'
+        'user_id',
+        'is_deleted',
     ];
 
     

@@ -8,7 +8,7 @@
       @if (strtolower(Auth::user()->roles()->first()->slug) == 'admin')
       <div class="breadcrumb-item">
         <a href="{{ url('/products/create') }}" class="btn btn-primary btn-sm">
-          Tambah Barang
+          <i class="fas fa-plus"></i> TAMBAH BARANG
         </a>
       </div>
       @endif

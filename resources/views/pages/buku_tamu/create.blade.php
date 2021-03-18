@@ -187,11 +187,12 @@
       //Open Camera
       $("#btnOpenCamera").click(function (e) { 
         e.preventDefault();
-        document.getElementById("myCamera").style.display = '';
         Webcam.attach('myCamera');
         $(this).attr("hidden", true);
         $("#btnSnapPicture").attr("hidden", false);
         $("#btnCloseCamera").attr("hidden", false);
+        document.getElementById("myCamera").style.display = '';
+        
       });
 
       //Close Camera
@@ -217,6 +218,10 @@
           icon: "success",
         });
 
+        if(visitors.imageFiles.length > 0) {
+          $("#btnResetAll").attr("hidden", false);
+        }
+
 
         if(visitors.imageFiles.length == 2) {
           Webcam.reset();
@@ -224,7 +229,6 @@
           $("#btnCloseCamera").attr("hidden", true);
           $("#btnSnapPicture").attr("hidden", true);
           $("#btnOpenCamera").attr("hidden", false);  
-          $("#btnResetAll").attr("hidden", false);      
           document.getElementById("myCamera").style.display = 'none';
         } 
       });
@@ -232,7 +236,7 @@
       //Reset Gambar
       $("#btnResetAll").click(function (e) { 
         e.preventDefault();
-        if(visitors.imageFiles.length == 2) {
+        if(visitors.imageFiles.length > 0) {
           visitors.imageFiles = [];
           setImagePreview(visitors.imageFiles);
           $("#btnResetAll").attr("hidden", true);

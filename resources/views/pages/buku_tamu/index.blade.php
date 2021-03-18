@@ -41,7 +41,7 @@
                 <div class="form-group row">
                   <label for="filterTimeIn" class="col-md-3 m-2">Waktu Masuk</label>
                   <div class="col-md-8">
-                    <input type="date" id="filterTimeIn" name="filterTimeIn" class="form-control" value="Y-m-d" />
+                    <input type="date" id="filterTimeIn" name="filterTimeIn" class="form-control"  />
                   </div>
                 </div>
 
@@ -197,11 +197,46 @@
     })
   }
 
+
   function refreshVisitor() {
     setDatatable('visitorTable');
     $("#filterStatus").val('bertamu')
     $("#filterTimeIn").val('');
   }
+
+  function deleteRow(id) {
+    const url = urlApi + "/" + id 
+    
+    Swal.fire({
+        title: 'HAPUS DATA TAMU',
+        text: 'Anda yakin ingin menghapus data ini ?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Hapus!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.delete(url).then((response) => {
+            const {data, status} = response;
+            if(status == 200) {
+              Swal.fire({
+                title: 'SUCCESS',
+                text: data.message,
+                confirmButtonText: `OK`,
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href = urlApi
+                }
+              })
+            }
+          }).catch((error) => {
+            console.log(error.response);
+          });
+        }
+      })
+  }
+  
 
   $(function () {
     setDatatable('visitorTable');

@@ -31,15 +31,25 @@ class ComplaintsController extends Controller
     public function index()
     {
         $user = Auth::user();
+        $slug = strtolower($user->roles()->first()->slug);
+
+        $dates = request()->has('dates') ? \Carbon\Carbon::parse(request()->query('dates'))->format('Y-m-d') : \Carbon\Carbon::today()->format('Y-m-d');
+
+
+        if(request()->has('sentences')) {
+            $sentences = request()->query('sentences');
+        }
+        else {
+            $sentences = $slug == 'admin' || $slug == 'customer' ? 'not_assigned' : 'assigned_accepted';
+        }
+
         if(!$user) {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
-        $sentences = request()->query('sentences');
-        $search = request()->query('search');
-        $slug = strtolower($user->roles()->first()->slug);
+        $records = Complaint::with(['sender', 'assigned', 'logs', 'types'])
+            ->whereDate('created_at', '=', $dates);
 
-        $records = Complaint::with(['sender', 'assigned', 'logs', 'types']);
 
         if($sentences) {
             switch ($sentences) {
@@ -59,18 +69,14 @@ class ComplaintsController extends Controller
         }
 
         
-        if($slug == 'pegawai') {
+        if($slug == 'customer') {
             $records = $records->where('sender_id', $user->id);
         }
 
-        if($slug != 'admin' && $slug != 'pegawai') {
+        if($slug != 'admin' && $slug != 'customer') {
             $records = $records->whereHas('assigned', function($q) use($user) {
                 $q->where('executor_id', $user->id);
             });
-        }
-
-        if($search && $search != '') {
-            $records = $records->where('title', 'like', '%'.$search.'%');
         }
         
         $records = $records->orderBy('updated_at', 'desc')->paginate($this->page); 
@@ -135,21 +141,21 @@ class ComplaintsController extends Controller
             Auth::user()->roles()->first()->slug
         );
 
-        if($slug != 'pegawai') {
+        if($slug != 'customer') {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
         $req->validate([
-            'title' => 'required|string',
+            // 'title' => 'required|string',
+            // 'is_urgent' => 'required',
             'messages' => 'required',
-            'is_urgent' => 'required',
             'type_id' => 'required',
         ]);
 
         $complaint = Complaint::create([
-            'title' => $req->title,
+            // 'title' => $req->title,
+            // 'is_urgent' => $req->is_urgent,
             'messages' => $req->messages,
-            'is_urgent' => $req->is_urgent,
             'sender_id' => Auth::user()->id,
             'type_id' => $req->type_id
         ]);

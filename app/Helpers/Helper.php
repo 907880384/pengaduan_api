@@ -52,8 +52,10 @@ class Helper {
 
 
             'CREATE_VISITOR_FAILED' => 'Gagal menambahkan tamu',
-            'CREATE_VISITOR_SUCCESS' => 'Data tamu berhasil di simpan',
-            'EXITED_VISITOR_SUCCESS' => 'Tamu telah selesai'
+            'CREATE_VISITOR_SUCCESS' => 'Data tamu berhasil disimpan',
+            'EXITED_VISITOR_SUCCESS' => 'Tamu telah selesai',
+            'DELETE_VISITOR_SUCCESS' => 'Data tamu berhasil dihapus',
+            'DELETE_VISITOR_FAILED' => 'Data tamu gagal dihapus'
         ];
     }
 

@@ -35,7 +35,7 @@ class VisitorController extends Controller
             'user',
             'fileVisitors',
             'typeIdentity'
-        ]);
+        ])->where('is_deleted', false);
 
         $records->where('selesai', $isDone);
 
@@ -172,7 +172,18 @@ class VisitorController extends Controller
 
     public function destroy($id)
     {
-        //
+        $user = Auth::user();
+        if($user->roles()->first()->slug != "admin") {
+            return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
+        }
+
+        $visitor = Visitor::find($id);
+        $visitor->is_deleted = true;
+        
+        if($visitor->save()) {
+            return $this->sendResponse(Helper::messageResponse()->DELETE_VISITOR_SUCCESS, 200);
+        }
+        return $this->sendResponse(Helper::messageResponse()->DELETE_VISITOR_FAILED, 400);
     }
 
     public function exitVisitor($id) {

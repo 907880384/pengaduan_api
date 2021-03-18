@@ -71,6 +71,7 @@
         "ioredis": "^4.17.3",
         "redis-server": "^1.2.2",
         "socket.io": "^2.3.0",
-        "sweetalert2": "^10.13.0"
+        "sweetalert2": "^10.13.0",
+        "webcam-easy": "^1.0.5"
     }
 }

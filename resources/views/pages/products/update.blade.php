@@ -46,7 +46,7 @@
                   Stok
                 </label>
                 <div class="col-sm-8">
-                  <input type="text" id="productStock" class="form-control" value="{{ $product->stock_awal }}" />
+                  <input type="text" id="productStock" class="form-control" value="{{ $product->stock }}" />
                 </div>
               </div>
   

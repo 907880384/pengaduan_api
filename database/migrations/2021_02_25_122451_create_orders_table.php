@@ -16,12 +16,15 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->uuid('product_id');
-            $table->unsignedBigInteger('qty')->nullable()->default(null);
-            $table->unsignedBigInteger('user_id')->nullable();
-            $table->string('status')->nullable()->default(null);
-            $table->date('order_date')->nullable()->default(null);
             $table->unsignedBigInteger('complaint_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('quantity')->nullable()->default(null);
+            $table->dateTime('order_date')->nullable()->default(null);
+            $table->boolean('is_agree')->nullable()->default(false);
+            $table->dateTime('agree_date')->nullable()->default(null);
+            $table->unsignedBigInteger('user_agree_id')->nullable();
             $table->timestamps();
+            
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }

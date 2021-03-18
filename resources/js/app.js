@@ -17,3 +17,4 @@ window.SOCKET_PORT = process.env.MIX_CLIENT_SOCKET_PORT;
 window.moment = require('moment');
 window.Swal = require('sweetalert2');
 
+//window.Webcam = require('webcam-easy');

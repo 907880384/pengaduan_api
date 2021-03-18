@@ -42,13 +42,10 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
         Route::resource('products', 'ProductController')->except(['edit', 'store', 'create', 'update', 'destroy']);
 
         /** Orders */
-        Route::get('orders', 'OrderController@index');
+        Route::resource('orders', 'OrderController')->except([
+            'edit', 'create'
+        ]);
 
-
-        /** Carts */
-        Route::post('carts/add', 'CartsController@createCart');
-        Route::get('carts/show/{id}', 'CartsController@showCart');
-        Route::get('carts/remove', 'CartsController@removeCart');
 
         Route::get('/information/complaints', 'InformationController@getComplaintInfo');
 
