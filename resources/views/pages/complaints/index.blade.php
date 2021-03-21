@@ -164,7 +164,9 @@
         {
           data: 'is_finished', 
           name: 'is_finished', 
-          render: function(data) {
+          className: 'text-center',
+          render: function(data, type, row) {
+            console.log(row);
             if (data)
               return '<div class="badge badge-primary">SELESAI</div>';
             else {
@@ -172,10 +174,24 @@
             }
           }
         },
-        {data: 'sender_name', name: 'sender_name'},
-        {data: 'types_name', name: 'types_name'},
-        {data: 'executor_name', name: 'executor_name'},
-        {data: 'action', name: 'action'}
+        {
+          data: 'sender_name', 
+          name: 'sender_name', 
+          className: 'text-center',
+          render: function(data) {
+            return `<b>${data}</b>`
+          }
+        },
+        {data: 'types_name', name: 'types_name', className: 'text-center'},
+        {
+          data: 'executor', 
+          name: 'executor', 
+          className: 'text-center',
+          render: function(data) {
+            return data != null ? '<b>' + data.name + '</b>' : '';
+          }
+        },
+        {data: 'action', name: 'action', className: 'text-center'}
       ],
       "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
     });

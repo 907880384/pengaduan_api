@@ -6,33 +6,101 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Product;
+use App\Events\OrdersCartEvent;
+use Auth;
+use DataTables;
 
 class OrderController extends Controller
 {
-    private $page = 10;
-    
+
     public function index()
     {
-        $records = Order::with(['product', 'user']);
-        $records = $records->orderBy('updated_at', 'desc')->paginate($this->page);
+        return view('pages.orders.index');
+    }
 
-        $records->getCollection()->transform(function($query) {
-            $query->fileImages = \App\Models\ProductFile::where('product_id', $query->product->id)->get();
-            return $query;
-        });    
+    public function listOrder(Request $req) {
+        $user = Auth::user();
+        
+        $records = Order::with([
+            'product',
+            'complaint',
+            'user',
+            'agreeter'
+        ]);
 
-        if(request()->ajax()) {
-            return view('pages.orders.datatable', compact('records'));
+        $records->orderBy('order_date', 'desc')->get();
+
+        return Datatables::of($records)->addIndexColumn()
+            ->addColumn('status', function($row) {
+                if($row->is_agree) {
+                    return 'DISETUJUI';
+                }
+                else {
+                    if($row->is_disagree) {
+                        return 'DITOLAK';
+                    }
+                    else {
+                        return 'MENUNGGU';
+                    }
+                }
+
+            })
+            ->addColumn('action', function($row) use($user) {
+                $str = '';
+
+                if(strtolower($user->roles()->first()->slug) == 'admin') {
+                    if(!$row->is_agree && !$row->is_disagree) {
+                        $str .= '<button type="button" class="btn btn-success btn-sm" onclick="setAgree('.$row->id.')"><i class="fas fa-check"></i>TERIMA</button>';
+
+                        $str .= '&nbsp;<button type="button" class="btn btn-danger btn-sm" onclick="setDisagree('.$row->id.')"><i class="fas fa-times"></i> TOLAK
+                        </button>';
+                    }
+                }
+                return $str;
+            })->rawColumns(['action'])->make(true);
+
+    }
+
+    public function countNewOrder() {
+        $totalOrder = Order::where('is_agree', false)->whereDate('order_date', \Carbon\ Carbon::today())->count();
+
+        return response([
+            'totalOrder' => $totalOrder
+        ], 200);
+    }
+
+    public function disagree(Request $req) {
+        $req->validate([
+            'orderId' => 'required',
+            'orderReason' => 'required'
+        ]);
+
+        $order = Order::find($req->orderId);
+        $order->reasons = $req->orderReason;
+        $order->is_disagree = true;
+        if($order->save()) {
+
+            $product = Product::find($order->product_id);
+            $product->stock = $product->stock + $order->quantity;
+            $product->save();
+
+            event(new OrdersCartEvent(
+                $order, 
+                $order->user_id,
+                "DISAGREE_ORDER"
+            ));
+
+            return response([
+                'message' => 'Permintaan penolakan pesanan anda disimpan'
+            ], 200);
         }
 
-        return view('pages.orders.index', compact('records'));
+        return response([
+            'message' => 'Permintaan penolakan pesanan gagal'
+        ], 400);
     }
 
-    
-    public function show($id)
-    {
+    public function agreed($id) {
+        
     }
-
-    
-    
 }

@@ -7,9 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Complaint extends Model
 {
     protected $fillable = [
-        // 'title',
         'messages',
-        // 'is_urgent',
         'is_finished',
         'is_assigned',
         'sender_id',

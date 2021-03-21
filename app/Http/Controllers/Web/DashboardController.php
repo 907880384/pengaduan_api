@@ -20,9 +20,9 @@ class DashboardController extends Controller
             "finish_complaint" => $this->queryComplaint($user)->where('is_finished', true)->whereDate('created_at', '=', $dates)->count(),
             "total_complaint" => $this->queryComplaint($user)->whereDate('created_at', '=', $dates)->count(),
 
-            "visitor_come" => Visitor::where('selesai', false)->whereDate('created_at', '=', $dates)->count(),
-            "visitor_exit" => Visitor::where('selesai', true)->whereDate('created_at', '=', $dates)->count(),
-            "total_visitor" => Visitor::whereDate('created_at', '=', $dates)->count(),
+            "visitor_come" => Visitor::where('selesai', false)->where('is_deleted', false)->whereDate('created_at', '=', $dates)->count(),
+            "visitor_exit" => Visitor::where('selesai', true)->where('is_deleted', false)->whereDate('created_at', '=', $dates)->count(),
+            "total_visitor" => Visitor::whereDate('created_at', '=', $dates)->where('is_deleted', false)->count(),
         ];
 
 

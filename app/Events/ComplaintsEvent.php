@@ -15,7 +15,7 @@ class ComplaintsEvent implements ShouldBroadcastNow
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
     public $data;
-    public $receiveData;
+    public $roleName;
     public $mobileNotif;
 
     /**
@@ -23,10 +23,10 @@ class ComplaintsEvent implements ShouldBroadcastNow
      *
      * @return void
      */
-    public function __construct($data, $receiveData, $mobileNotif)
+    public function __construct($data, $roleName, $mobileNotif)
     {
         $this->data = $data;
-        $this->receiveData = $receiveData;
+        $this->roleName = $roleName;
         $this->mobileNotif = $mobileNotif;
     }
 
@@ -48,7 +48,7 @@ class ComplaintsEvent implements ShouldBroadcastNow
     {
       return [
         'data' => $this->data,    
-        'receiveData' => $this->receiveData,
+        'roleName' => $this->roleName,
         'mobileNotif' => $this->mobileNotif
       ];
     }

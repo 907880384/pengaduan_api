@@ -6,7 +6,9 @@
     <h1>Form Update Barang</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="{{ url('products') }}">List Barang</a>
+        <a href="{{ url('products') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-clipboard-list"></i> LIST BARANG
+        </a>
       </div>
     </div>
   </div>

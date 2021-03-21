@@ -68,5 +68,20 @@ class MobileNotificationController extends Controller
         }
         return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);   
     }
+
+    public function findOneNotifBy($userId, $type) {
+        $notif = MobileNotification::where('receiver_id', $userId)
+            ->where('type', $type)
+            ->where('read_at', null)
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if(!$notif) {
+            return response(['message' => 'Notification tidak ditemukan'], 404);
+        }
+        
+        return response($notif, 200);
+    }
+
     
 }

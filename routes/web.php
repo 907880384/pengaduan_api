@@ -58,6 +58,9 @@ Route::group(['middleware' => ['auth']], function () {
         'Web\OrderController', 
         ['only' => ['index', 'show']]
     );
+    Route::get('count/new/orders', 'Web\OrderController@countNewOrder');
+    Route::get('orders/agreed/{id}', 'Web\OrderController@agreed');
+    Route::post('orders/disagree', 'Web\OrderController@disagree');
 
     /** Activities */
     Route::group(['prefix' => 'activities'], function () {
@@ -65,6 +68,8 @@ Route::group(['middleware' => ['auth']], function () {
     });
 
     Route::group(['prefix' => 'mobile_notification'], function () {
+        Route::get('/find/{user}/type/{type}/notification', 'Web\MobileNotificationController@findOneNotifBy');
+
         Route::get('/find/{receiver}/limit', 'Web\MobileNotificationController@findLimit');
         Route::get('/show', 'Web\MobileNotificationController@show');
         Route::get('/read/{notifId}', 'Web\MobileNotificationController@read');
@@ -75,9 +80,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('visitors/exit/{id}', 'Web\VisitorController@exitVisitor');
 
 
-
-
     /** Datatable */
     Route::get('list/complaints', 'Web\ComplaintsController@listComplaints')->name('list.complaints');
     Route::get('list/visitors', 'Web\VisitorController@listVisitors')->name('list.visitors');
+    Route::get('list/orders', 'Web\OrderController@listOrder')->name('list.orders');
 });

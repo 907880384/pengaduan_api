@@ -15,8 +15,15 @@
   </form>
   <ul class="navbar-nav navbar-right">
     <li class="dropdown dropdown-list-toggle">
-      <a id="notifications" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg">
-        <i class="fa fa-bell" aria-hidden="true"></i>
+      <a href="#" type="button" class="btn btn-primary">
+        <i class="fas fa-shopping-cart"></i> 
+        <span id="totalOrder" class="badge badge-danger"></span>
+      </a>
+    </li>
+
+    <li class="dropdown dropdown-list-toggle">
+      <a id="notifications" class="nav-link nav-link-lg" data-toggle="dropdown">
+        <i class="fas fa-bell" aria-hidden="true"></i>
       </a>
       <div class="dropdown-menu dropdown-list dropdown-menu-right">
         <div class="dropdown-header">
@@ -38,6 +45,8 @@
         </div>
       </div>
     </li>
+
+
     <li class="dropdown">
       <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
         <img alt="image" src="{{ asset('assets/img/avatar/avatar-1.png') }}" class="rounded-circle mr-1">

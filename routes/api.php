@@ -35,6 +35,7 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
             Route::get('/show/all', 'MobileNotificationController@showAll');
             Route::get('/read/{notifId}', 'MobileNotificationController@readById');
             Route::get('/count/unread', 'MobileNotificationController@countUnread');
+            Route::get('/find/{user}/type/{type}', 'MobileNotificationController@findOneNotifBy');
         });
 
 
@@ -45,6 +46,7 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
         Route::resource('orders', 'OrderController')->except([
             'edit', 'create'
         ]);
+        Route::get('wait/orders', 'OrderController@getOrderWait');
 
 
         Route::get('/information/complaints', 'InformationController@getComplaintInfo');

@@ -134,7 +134,7 @@ class ComplaintsController extends Controller
         
     }
 
-
+    //
     public function store(Request $req)
     {
         $slug = strtolower(
@@ -146,15 +146,11 @@ class ComplaintsController extends Controller
         }
 
         $req->validate([
-            // 'title' => 'required|string',
-            // 'is_urgent' => 'required',
             'messages' => 'required',
             'type_id' => 'required',
         ]);
 
         $complaint = Complaint::create([
-            // 'title' => $req->title,
-            // 'is_urgent' => $req->is_urgent,
             'messages' => $req->messages,
             'sender_id' => Auth::user()->id,
             'type_id' => $req->type_id
@@ -164,20 +160,29 @@ class ComplaintsController extends Controller
             return $this->sendResponse(Helper::messageResponse()->COMPLAINT_CREATE_FAIL, 400);
         }
 
-        $notification = MobileNotification::create([
-            'type' => 'CREATE_NEW_COMPLAINT',
-            'receiver_id' => 1,
-            'messages' => Auth::user()->name . ' menambahkan pengaduan baru',
-            'data' => json_encode($complaint, true),
-        ]);
+        $users = User::with('roles')->whereHas('roles', function($q) {
+            $q->where('slug', 'admin');
+        })->get(['id']);
 
-        if(!$notification) {
-            return $this->sendResponse(Helper::messageResponse()->NOTIFICATION_ADD_FAIL);
+        $notifData = [];
+        foreach ($users as $u) {
+            $notifData[] = MobileNotification::create([
+                'type' => 'CREATE_NEW_COMPLAINT',
+                'receiver_id' => $u->id,
+                'messages' => Auth::user()->name . ' menambahkan pengaduan baru',
+                'data' => json_encode($complaint, true),
+            ]);
         }
 
-        event(new ComplaintsEvent($complaint, 1, $notification));
+        event(new ComplaintsEvent(
+            $complaint, 
+            "admin", 
+            $notifData
+        ));
 
-        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_CREATE_SUCCESS);
+        return $this->sendResponse(
+            Helper::messageResponse()->COMPLAINT_CREATE_SUCCESS
+        );
     }
 
     
@@ -223,14 +228,17 @@ class ComplaintsController extends Controller
             return $this->sendResponse(Helper::messageResponse()->COMPLAINT_ASSIGNED_FAIL, 400);
         }
 
-        $mobileNotif = MobileNotification::create([
+        $notifData = [];
+        $notifData[] = MobileNotification::create([
             'type' => 'COMPLAINT_ASSIGNED',
             'receiver_id' => $req->executor_id,
             'messages' => 'Informasi Pengaduan '.$complaint->title. ' telah ditugaskan',
             'data' => json_encode($complaint, true),
         ]);
 
-        event(new AssignedComplaintEvent($assigned, $req->executor_id, $mobileNotif));
+        event(new AssignedComplaintEvent(
+            $assigned, [$req->executor_id], $notifData
+        ));
     
         return $this->sendResponse(Helper::messageResponse()->COMPLAINT_ASSIGNED);
         
@@ -240,7 +248,7 @@ class ComplaintsController extends Controller
     {
         $slug = strtolower(Auth::user()->roles()->first()->slug);
 
-        if($slug === 'admin' || $slug === 'pegawai') {
+        if($slug === 'admin' || $slug === 'customer') {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
@@ -256,39 +264,49 @@ class ComplaintsController extends Controller
 
         $complaint = Complaint::with(['sender', 'assigned', 'logs', 'types'])->find($assigned->complaint_id);
 
-        $mobileNotif = MobileNotification::insert([
-            [
-                'type' => 'COMPLAINT_WORK_ACCEPTED',
-                'receiver_id' => $complaint->sender_id,
-                'messages' => Auth::user()->name. " Menerima dan melaksanakan pekerjaan sesuai pengaduan",
-                'data' => json_encode($complaint, true),
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'type' => 'COMPLAINT_WORK_ACCEPTED',
-                'receiver_id' => 1,
-                'messages' => Auth::user()->name. " Menerima dan melaksanakan pekerjaan sesuai pengaduan",
-                'data' => json_encode($complaint, true),
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]
+
+        $users = User::with('roles')->whereHas('roles', function($q) {
+            $q->where('slug', 'admin');
+        })->get(['id']);
+
+        $notifData = [];
+        $notifData[] = MobileNotification::create([
+            'type' => 'COMPLAINT_WORK_ACCEPTED',
+            'receiver_id' => $complaint->sender_id,
+            'messages' => Auth::user()->name. " Menerima dan melaksanakan pekerjaan sesuai pengaduan",
+            'data' => json_encode($complaint, true),
         ]);
+
+        foreach ($users as $u) {
+            $notifData[] = MobileNotification::create([
+                'type' => 'COMPLAINT_WORK_ACCEPTED',
+                'receiver_id' => $u->id,
+                'messages' => Auth::user()->name. " Menerima dan melaksanakan pekerjaan sesuai pengaduan",
+                'data' => json_encode($complaint, true),
+            ]);
+        }
 
         event(new AssignedWorkingComplaintEvent(
             $complaint, 
-            [$complaint->sender_id, 1],
-            $mobileNotif
+            array_merge(
+                [$complaint->sender_id],
+                $users->transform(function($q) {
+                    return $q->id;
+                })->toArray()
+            ),
+            $notifData
         ));
 
-        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_WORK_ACCEPTED);
+        return $this->sendResponse(
+            Helper::messageResponse()->COMPLAINT_WORK_ACCEPTED
+        );
     }
 
     public function finishedComplaint(Request $req)
     {
         $slug = strtolower(Auth::user()->roles()->first()->slug);
 
-        if($slug == 'admin' || $slug == 'pegawai') {
+        if($slug == 'admin' || $slug == 'customer') {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
         }
 
@@ -343,27 +361,41 @@ class ComplaintsController extends Controller
         $complaint->save();
 
 
-        $mobileNotif = MobileNotification::insert([
-            [
-                'type' => 'FINISHED_COMPLAINT',
-                'receiver_id' => $complaint->sender_id,
-                'messages' => Auth::user()->name. " telah menyelesaikan pekerjaan dan melaporkan hasil pekerjaan dengan baik",
-                'data' => json_encode($complaint, true),
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ],
-            [
-                'type' => 'FINISHED_COMPLAINT',
-                'receiver_id' => 1,
-                'messages' => Auth::user()->name. " telah menyelesaikan pekerjaan dan melaporkan hasil pekerjaan dengan baik",
-                'data' => json_encode($complaint, true),
-                'created_at' => \Carbon\Carbon::now(),
-                'updated_at' => \Carbon\Carbon::now(),
-            ]
+        $users = User::with('roles')->whereHas('roles', function($q) {
+            $q->where('slug', 'admin');
+        })->get(['id']);
+
+        $notifData = [];
+        $notifData[] = MobileNotification::create([
+            'type' => 'FINISHED_COMPLAINT',
+            'receiver_id' => $complaint->sender_id,
+            'messages' => Auth::user()->name. " telah menyelesaikan pekerjaan dan melaporkan hasil pekerjaan dengan baik",
+            'data' => json_encode($complaint, true),
         ]);
 
-        event(new FinishedComplaintEvent($complaint, [$complaint->sender_id, 1], $mobileNotif));
-        return $this->sendResponse(Helper::messageResponse()->COMPLAINT_FINISHED);
+        foreach ($users as $u) {
+            $notifData[] = MobileNotification::create([
+                'type' => 'FINISHED_COMPLAINT',
+                'receiver_id' => $u->id,
+                'messages' => Auth::user()->name. " telah menyelesaikan pekerjaan dan melaporkan hasil pekerjaan dengan baik",
+                'data' => json_encode($complaint, true),
+            ]);
+        }
+
+        event(new FinishedComplaintEvent(
+            $complaint, 
+            array_merge(
+                [$complaint->sender_id],
+                $users->transform(function($q) {
+                    return $q->id;
+                })->toArray()
+            ), 
+            $notifData
+        ));
+        
+        return $this->sendResponse(
+            Helper::messageResponse()->COMPLAINT_FINISHED
+        );
 
     }
 }

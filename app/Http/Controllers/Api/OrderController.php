@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Events\OrdersCartEvent;
 use App\Models\Product;
 use App\Models\Order;
 use Auth;
 use Helper;
+
 
 class OrderController extends Controller
 {
@@ -23,7 +25,7 @@ class OrderController extends Controller
         $user = Auth::user();
         $slug = strtolower($user->roles()->first()->slug);
 
-        $order = Order::with([
+        $records = Order::with([
             'product',
             'complaint',
             'user',
@@ -37,6 +39,28 @@ class OrderController extends Controller
 
     }
 
+    public function getOrderWait() {
+        $user = Auth::user();
+
+        $orders = Order::with([
+            'product',
+            'complaint',
+            'user',
+            'agreeter'
+        ])
+        ->where('is_agree', false)
+        ->where('is_disagree', false)
+        ->where('user_id', $user->id)
+        ->orderBy('order_date', 'DESC')
+        ->get();
+
+        if(!$orders){
+            return $this->sendResponse(Helper::messageResponse()->CART_NOT_FOUND, 400);
+        }
+            
+        return response(['orders' => $orders], 200); 
+    }
+
     public function store(Request $req) {
         $user = Auth::user();
         $slug = strtolower($user->roles()->first()->slug);
@@ -44,11 +68,25 @@ class OrderController extends Controller
         $req->validate([
             'complaintId' => 'required',
             'productId' => 'required',
-            'quantity' => 'required'
+            'quantity' => 'required|numeric'
         ]);
 
         if($slug == 'customer' || $slug == 'admin' ) {
             return $this->sendResponse(Helper::messageResponse()->NOT_ACCESSED, 400);
+        }
+
+        $product = Product::find($req->productId);
+
+        if(!$product) {
+            return $this->sendResponse(Helper::messageResponse()->PRODUCT_NOT_FOUND, 400);
+        }
+
+        if($product->stock >= $req->quantity) {
+            $product->stock = $product->stock - $req->quantity;
+            $product->save();
+        }
+        else {
+            return $this->sendResponse(Helper::messageResponse()->ADD_CART_REJECTED, 400);
         }
 
         $order = Order::create([
@@ -63,7 +101,16 @@ class OrderController extends Controller
             return $this->sendResponse(Helper::messageResponse()->ADD_CART_FAILED, 400);
         }
 
-        return $this->sendResponse(Helper::messageResponse()->ADD_CART_SUCCESS, 200);
+        event(new OrdersCartEvent(
+            $order, 
+            "admin", 
+            "ADD_ORDER"
+        ));
+
+        return response([
+            'message' => Helper::messageResponse()->ADD_CART_SUCCESS,
+            'order' => $order
+        ], 200);
 
     }
 }

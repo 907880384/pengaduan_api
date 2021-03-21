@@ -50,7 +50,7 @@
           channelName: 'assign-complaint-channel',
           eventName: 'AssignedComplaintEvent'
         },
-        assignedWorkingComplaint: {
+        startWorkingComplaint: {
           channelName: 'start-work-complaint-channel',
           eventName: 'StartWorkComplaintEvent'
         },
@@ -62,28 +62,39 @@
           channelName: 'notification-channel',
           eventName: 'NotificationEvent',
         },
+        cartOrder: {
+          channelName: {
+            agree: 'agree-order-channel',
+            disagree: 'disagree-order-channel',
+            add: 'add-order-channel'
+          },
+          eventName: 'CartOrderEvent',
+        }
       },
     }
 
-    var notifications = [];
-
-    function loadNotification(user_id) {
+    function initNotification(user_id) {
       $.get(`${urlNotif}/find/${user_id}/limit`, (data) => {
-        console.log("Result Get Notification Data", data);
-        setNotification(data.result, "#notifications")
+        localStorage.setItem('notifications', JSON.stringify(data.results));
+        setNotification(data.results, "#notifications")
       });
+    }
+
+    function loadNotification(data) {
+      setNotification(data, "#notifications")
     }
 
     function setNotification(data, target)
     {
-      notifications = _.concat(notifications, data);
-      notifications.slice(0, 5);
-      showNotification(notifications, target);
+      let localNotif = data;
+      localNotif.slice(0, 5);
+      showNotification(localNotif, target);
     }
 
     function showNotification(data, target)
     {
-      if(data.length) {
+      console.log("ARRAY NOTIFICATION", data);
+      if(data.length > 0) {
         const url = urlNotif + '/show';
 
         var htmlElements = data.map(function (notification) {
@@ -108,7 +119,6 @@
       const msg = textNotification(data);
 
       var str = '<a href="' + url + '" class="dropdown-item dropdown-item-unread">' + msg + '</a>';
-      console.log(str)
       return str
     }
 
@@ -134,14 +144,31 @@
       return text;
     }
 
-    $(function () {
+    function cartCount() {
+      const urlCart = "{{ url('count/new/orders') }}"
+      axios.get(urlCart).then((response) => {
+        const {data, status} = response;
+        if(status == 200) {
+          localStorage.setItem('totalOrder', data.totalOrder.toString());
+        }
+      }).catch((error) => {
+        console.log(error.response);
+      });
+    }
 
-      let authUser   = @json(auth()->user());
+    function readCartCount() {
+      const total = localStorage.getItem('totalOrder')
+      $("#totalOrder").text(total)
+    }
+
+    $(function () {
+      let authUser  = @json(auth()->user());
+      let userRole  = @json(auth()->user()->roles()->first());
       let socket = io(CLIENT_SOCKET_HOST + ":" + CLIENT_SOCKET_PORT);
 
-      console.log("AUTH USER", authUser)
-      loadNotification(authUser.id);
-
+      initNotification(authUser.id)
+      cartCount();
+      readCartCount();
 
       socket.on('connect', () => {
         socket.emit('sendUserLogin', authUser.id);
@@ -151,37 +178,104 @@
         console.log("Now Data Receive", data);
       });
 
-
+      /** EVENT CREATE COMPLAINT */
       socket.on(globalBroadcast.event.complaint.channelName + ":" + globalBroadcast.event.complaint.eventName, (message) => {
-        console.log(`${globalBroadcast.event.complaint.channelName}`, message);
-        if(authUser.id == message.receiveData) {
-          loadNotification(message.receiveData);
+        const {roleName, mobileNotif: notifs} = message;
+        
+        if(userRole.slug == roleName) {
+          const filterNotif = notifs.filter(item => item.receiver_id == authUser.id, [])
+          if(filterNotif.length > 0) {
+            let resultNotif = JSON.parse(localStorage.getItem('notifications'));
+            resultNotif = [...resultNotif, ...filterNotif];
+            loadNotification(resultNotif);
+          }
         }
       });
 
+      /** EVENT ASSIGNED COMPLAINT */
       socket.on(globalBroadcast.event.assignedComplaint.channelName + ":" + globalBroadcast.event.assignedComplaint.eventName, (message) => {
-        console.log(message);
-        if(authUser.id == message.receiveData) {
-          loadNotification(message.receiveData);
-        }
-      });
+        const {receiveData: receivers, mobileNotif: notifs} = message;
+        const filters = receivers.filter((item) => item == authUser.id, []);
 
-      socket.on(globalBroadcast.event.assignedWorkingComplaint.channelName + ":" + globalBroadcast.event.assignedWorkingComplaint.eventName, (message) => {
-        console.log(message);
-        const filters = message.receiveData.filter((item) => item == authUser.id);
         if(filters.length > 0) {
-          loadNotification(filters[0]);
+          const filterNotif = notifs.filter(item => item.receiver_id == authUser.id, [])
+          let resultNotif = JSON.parse(localStorage.getItem('notifications'));
+            resultNotif = [...resultNotif, ...filterNotif];
+
+          loadNotification(resultNotif);
         }
       });
 
+      /** START WORKING */
+      socket.on(globalBroadcast.event.startWorkingComplaint.channelName + ":" + globalBroadcast.event.startWorkingComplaint.eventName, (message) => {
 
+        const {messageNotif: notifs,  receiveData: receivers} = message;
+        const filters = receivers.filter((item) => item == authUser.id, []);
+
+        if(filters.length > 0) {
+          const filterNotif = notifs.filter(item => item.receiver_id == authUser.id, [])
+          let resultNotif = JSON.parse(localStorage.getItem('notifications'));
+            resultNotif = [...resultNotif, ...filterNotif];
+
+          loadNotification(resultNotif);
+        }
+      });
+
+      /** FINISH WORKING */
       socket.on(globalBroadcast.event.finishWorkComplaint.channelName + ":" + globalBroadcast.event.finishWorkComplaint.eventName, (message) => {
-        console.log(message);
-        const filters = message.receiveData.filter((item) => item == authUser.id);
+        
+        const {receiveData: receivers, mobileNotif: notifs} = message;
+        const filters = receivers.filter(item => item == authUser.id);
+        
         if(filters.length > 0) {
-          loadNotification(filters[0]);
+          const filterNotif = notifs.filter(item => item.receiver_id == authUser.id, [])
+          let resultNotif = JSON.parse(localStorage.getItem('notifications'));
+            resultNotif = [...resultNotif, ...filterNotif];
+          loadNotification(resultNotif);
         }
       });
+
+
+      /** Order Socket Channel */
+      socket.on(globalBroadcast.event.cartOrder.channelName.add + ":" +  globalBroadcast.event.cartOrder.eventName, (message) => {
+        console.log(`${globalBroadcast.event.cartOrder.channelName.add}`, message);
+        const {receivers} = message;
+        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
+
+        if(userRole.slug == receivers) {
+          totalOrder += 1
+          localStorage.setItem('totalOrder', totalOrder);
+          readCartCount()
+        }
+      });
+
+      /** Agree Order Socket Channel */
+      socket.on(globalBroadcast.event.cartOrder.channelName.agree + ":" + globalBroadcast.event.cartOrder.eventName, (message) => {
+        console.log(`${globalBroadcast.event.cartOrder.channelName.agree}`, message);
+        const {receivers} = message;
+        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
+
+        if(receivers == authUser.id) {
+          totalOrder -= 1;
+          localStorage.setItem('totalOrder', totalOrder);
+          readCartCount()
+        }
+      });
+
+      /** Disagree Order Socket Channel */
+      socket.on(globalBroadcast.event.cartOrder.channelName.disagree + ":" + globalBroadcast.event.cartOrder.eventName, (message) => {
+        console.log("MESSAGE", message);
+        const {receivers} = message;
+        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
+        
+
+        if(receivers == authUser.id) {
+          totalOrder -= 1;
+          localStorage.setItem('totalOrder', totalOrder);
+          readCartCount()
+        }
+      });
+
     });
   </script>
   @stack('scripts')

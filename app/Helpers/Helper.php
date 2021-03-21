@@ -44,8 +44,10 @@ class Helper {
 
             'ADD_CART_SUCCESS' => 'Pesanan anda berhasil ditambahkan',
             'ADD_CART_FAILED' => 'Pesanan anda gagal ditambahkan',
+            'ADD_CART_REJECTED' => 'Pesanan anda ditolak. Stok tidak mencukupi',
             'REMOVE_CART_ALL' => 'Seluruh keranjang belanja dihapus',
             'SHOW_CART_EMPTY' => 'Keranjang belanja kosong' ,
+            'CART_NOT_FOUND' => 'Pesanan anda tidak ditemuka',
             'SHOW_CART_SUCCCESS' => 'Tersedia keranjang belanja',
             'CART_NOT_READY' => 'Daftar belanja tidak ditemukan',
             'UPDATE_CART_FAILED' => 'Ubah daftar belanja gagal',

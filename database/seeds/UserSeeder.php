@@ -22,6 +22,12 @@ class UserSeeder extends Seeder
                 'password' => bcrypt('12345678'),
                 'role' => 'admin'
             ],
+            [
+                'name' => 'Ruben Alpredo Tampubolon',
+                'username' => 'ben',
+                'password' => bcrypt('77'),
+                'role' => 'admin'
+            ],
 
             //Employees
             [
@@ -53,7 +59,7 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Ardi Wijaya',
                 'username' => 'ardi',
-                'password' => bcrypt('12345678'),
+                'password' => bcrypt('12'),
                 'role' => 'teknisi'
             ],
 

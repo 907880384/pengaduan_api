@@ -17,6 +17,10 @@ var listChannel = {
   startWorkingComplaintChannel: 'start-work-complaint-channel',
   finishedWorkingComplaintChannel: 'finished-work-complaint-channel',
   notificationChannel: 'notification-channel',
+  
+  addOrderChannel: 'add-order-channel',
+  agreeOrderChannel: 'agree-order-channel',
+  disagreeOrderChannel: 'disagree-order-channel'
 }
 
 
@@ -32,16 +36,31 @@ redis.subscribe(listChannel.assignedComplaintChannel, () => {
   console.log(`Now you subscribe channel ${listChannel.assignedComplaintChannel}`);
 });
 
-redis.subscribe(listChannel.assignedWorkingComplaintChannel, () => {
+redis.subscribe(listChannel.startWorkingComplaintChannel, () => {
   console.log(`Now you subscribe channel ${listChannel.startWorkingComplaintChannel}`);
 });
 
-redis.subscribe(listChannel.finishedComplaint, () => {
+redis.subscribe(listChannel.finishedWorkingComplaintChannel, () => {
   console.log(`Now you subscribe channel ${listChannel.finishedWorkingComplaintChannel}`);
 });
 
 redis.subscribe(listChannel.readNotification, () => {
   console.log(`Now you subscribe channel ${listChannel.notificationChannel}`);
+});
+
+//Order Channel
+redis.subscribe(listChannel.addOrderChannel, () => {
+  console.log(`Now you subscribe channel ${listChannel.addOrderChannel}`);
+});
+
+//Agree Order Channel
+redis.subscribe(listChannel.agreeOrderChannel, () => {
+  console.log(`Now you subscribe channel ${listChannel.agreeOrderChannel}`);
+});
+
+//Disagree Order Channel
+redis.subscribe(listChannel.disagreeOrderChannel, () => {
+  console.log(`Now you subscribe channel ${listChannel.disagreeOrderChannel}`);
 });
 
 
