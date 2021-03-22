@@ -267,7 +267,6 @@
         console.log("MESSAGE", message);
         const {receivers} = message;
         let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
-        
 
         if(receivers == authUser.id) {
           totalOrder -= 1;

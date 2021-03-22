@@ -169,6 +169,8 @@ return [
         Laravel\Passport\PassportServiceProvider::class,
         Darryldecode\Cart\CartServiceProvider::class,
         Yajra\DataTables\DataTablesServiceProvider::class,
+        Maatwebsite\Excel\ExcelServiceProvider::class,
+
         // Barryvdh\Cors\ServiceProvider::class,
         /*
          * Application Service Providers...
@@ -233,6 +235,7 @@ return [
         'Helper' => App\Helpers\Helper::class,
         'Cart' => Darryldecode\Cart\Facades\CartFacade::class,
         'DataTables' => Yajra\DataTables\Facades\DataTables::class,
+        'Excel' => Maatwebsite\Excel\Facades\Excel::class,
     ],
 
 ];

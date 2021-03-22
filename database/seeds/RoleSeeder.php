@@ -8,12 +8,17 @@ class RoleSeeder extends Seeder
     private function roles() {
         return [
             [
-                "name" => "Administrator", 
+                "name" => "System Engineer", 
+                "slug" => "developer",
+                "alias" => "developer"
+            ],
+            [
+                "name" => "Administrator",
                 "slug" => "admin",
                 "alias" => "administrator"
             ],
             [
-                "name" => "Pegawai (ASN)", 
+                "name" => "ASN", 
                 "slug" => "customer",
                 "alias" => "customer"
             ],

@@ -6,7 +6,7 @@
     <h1>Form Pengguna</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item">
-        <a href="{{ url('users') }}" class="btn btn-success btn-sm">
+        <a href="{{ url('users') }}" class="btn btn-primary btn-sm">
           <i class="fas fa-clipboard-list"></i> LIST PENGGUNA
         </a>
       </div>

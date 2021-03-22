@@ -154,9 +154,9 @@
             return ''
           }
         },
-        {data: 'no_hp', name: 'no_hp'},
         {data: 'tujuan', name: 'tujuan'},
         {data: 'keterangan', name: 'keterangan'},
+        {data: 'no_hp', name: 'no_hp'},
         {data: 'action',name: 'action'},
       ],
       "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]

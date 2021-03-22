@@ -6,13 +6,25 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\User;
 use App\Models\Role;
+use App\Imports\UserImport;
+use Auth;
+use DataTables;
+use File;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UsersController extends Controller
 {
     private $page = 10;
 
     private function getRoles() {
-        $roles = Role::where('slug', '!=', 'admin')->get();
+        $slug = strtolower(Auth::user()->roles()->first()->slug);
+        $roles = Role::where('slug', '!=', 'developer');
+
+        if($slug == 'admin') {
+            $roles = $roles->where('slug', '!=', 'admin');
+        }
+        $roles = $roles->get();
+
         $roles->transform(function($query) {
             $query->fullslug = implode(
                 ' ', 
@@ -26,29 +38,57 @@ class UsersController extends Controller
     public function index()
     {
         $roles = $this->getRoles();
-        
+        return view('pages.users.index', compact('roles'));
+    }
+
+    public function listUsers(Request $req) {
+        $user = Auth::user();
+        $slug = strtolower(Auth::user()->roles()->first()->slug);
         $records = User::with('roles');
 
-        if(request()->query('filterRole') != null) {
-            $filterRole = request()->query('filterRole');
-            $records = $records->whereHas('roles', function($q) use($filterRole) {
-                $q->where('id', $filterRole);
+        if($slug == 'admin') {
+            $records = $records->whereHas('roles', function($q) {
+                $q->where('slug', '!=', 'developer');
+                $q->where('slug', '!=', 'admin');
             });
         }
 
-        if(request()->query('filterSearch') != null) {
-            $filterSearch = request()->query('filterSearch');
-            $records = $records->where('name' ,'like', '%'.$filterSearch. '%');
+        if($slug == 'developer') {
+            $records = $records->whereHas('roles', function($q) {
+                $q->where('slug', '!=', 'developer');
+            });
         }
 
-        $records = $records->orderBy('id', 'desc')->paginate($this->page);
-
-        
-        if(request()->ajax()) {
-            return view('pages.users.user_pagination', compact('records'));
+        if($req->has('filterRole')) {
+            $records = $records->whereHas('roles', function($q) use($req) {
+                $q->where('id', $req->query('filterRole'));
+            });
         }
 
-        return view('pages.users.index', compact('records', 'roles'));
+        if($req->has('filterSearch') && $req->query('filterSearch') != '') {
+            $records = $records->where('name' ,'like', '%'.$req->query('filterSearch'). '%');
+        }
+
+        $records->orderBy('created_at', 'desc')->get();
+
+
+        return Datatables::of($records)->addIndexColumn()
+            ->addColumn('role_name', function($row) {
+                if($row->roles[0]->slug == 'admin') {
+                    return $row->roles[0]->name;
+                }
+                return ucfirst($row->roles[0]->alias) . ' (' . $row->roles[0]->name. ')';
+            })
+            ->addColumn('action', function($row) use($user) {
+                $str = '';
+                if($user->roles()->first()->slug == 'admin' || $user->roles()->first()->slug == 'developer') {
+                    $str .= '<button type="button" class="btn btn-danger btn-sm" onclick="deleteRow('.$row->id.')"><i class="fas fa-trash"></i> HAPUS
+                    </button>';
+                }
+                    
+                return $str;
+            })->rawColumns(['action'])->make(true);
+
     }
 
     public function show($id)
@@ -109,5 +149,90 @@ class UsersController extends Controller
 
         return response()->json(['message' => 'Users not found'], 404);
         
+    }
+
+    public function viewUploadUser() {
+        return view('pages.users.upload_user');
+    }
+
+    public function uploadUserFile(Request $req) {
+        $req->validate([
+            'userfile' => 'required'
+        ]);
+
+        
+        $extension = File::extension($req->file('userfile')->getClientOriginalName());
+        
+
+        if($extension == 'xlsx' || $extension == 'xls') {
+            $rows = Excel::toArray(new UserImport, $req->file('userfile'));
+            $errors = [];
+            $success = [];
+
+            foreach ($rows[0] as $key => $value) {
+                if($key > 0) {
+                    
+                    if($value[0] != null && !empty($value[0])) {
+                        if($this->foundUser($value[0], $value[1]) == true) {
+                            $errors[] = [$value[0], $value[1], $value[2], $value[3]];
+                        }
+                        else {
+                            $success[] = [$value[0], $value[1], $value[2], $value[3]];
+                        }
+                    }
+                    
+                }
+            }
+
+            if(count($success) > 0) {
+                $this->insertUserArray($success);
+
+                if(count($errors) > 0) {
+                    return response([
+                        'success' => false,
+                        'message' => 'Beberapa data pengguna berhasil disimpan',
+                        'errors' => $errors,
+                        'success' => $success 
+                    ], 200);
+                }
+
+                return response([
+                    'success' => true,
+                    'message' => 'Data pengguna berhasil disimpan',
+                    'success' => $success
+                ], 200);
+
+            }
+            else {
+                return response([
+                    'success' => false,
+                    'message' => 'Seluruh data pengguna gagal disimpan',
+                    'errors' => $errors 
+                ], 200);
+            }
+        }
+
+
+        return response([
+            'message' => 'Ekstensi file yang anda masukkan tidak mendukung'
+        ], 400);
+
+    }
+
+    public function foundUser($name, $username) {
+        $user = User::where('name', $name)->orWhere('username', $username)->first();
+        return $user ? true : false;
+    }
+
+    public function insertUserArray($data) {
+        foreach ($data as $value) {
+            $password = $value[2] != null && !empty($value[2]) ? $value[2] : '12345678';
+            $user = User::create([
+                'name' => $value[0],
+                'username' => $value[1],
+                'password' =>  bcrypt($password),
+            ]);
+            $user->roles()->attach(Role::where('slug',$value[3])->first());
+        }
     }
 }

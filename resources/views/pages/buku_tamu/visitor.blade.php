@@ -3,16 +3,19 @@
     <table id="visitorTable" class="table table-bordered table-hover nowrap table-sm" width="100%">
       <thead>
         <tr class="text-center bg-primary text-white">
-          <th>No</th>
-          <th>Nama</th>
-          <th>Identitas</th>
-          <th>Status</th>
-          <th>Waktu Kunjung</th>
-          <th>Waktu Selesai</th>
-          <th>No.HP</th>
-          <th>Tujuan</th>
-          <th>Keterangan</th>
-          <th>Action</th>
+          <th rowspan="2">NO</th>
+          <th rowspan="2">NAMA</th>
+          <th rowspan="2">IDENTITAS</th>
+          <th rowspan="2">STATUS</th>
+          <th colspan="3">KUNJUNGAN</th>
+          <th rowspan="2">TUJUAN</th>
+          <th rowspan="2">KETERANGAN</th>
+          <th rowspan="2">NO.HP</th>
+          <th rowspan="2">ACTION</th>
+        </tr>
+        <tr class="text-center bg-primary text-white">
+          <th>MULAI</th>
+          <th>SELESAI</th>
         </tr>
       </thead>
     </table>

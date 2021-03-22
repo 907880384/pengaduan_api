@@ -30,6 +30,8 @@ Route::group(['middleware' => ['auth']], function () {
     /** Users */
     Route::resource('users', 'Web\UsersController')->except(['edit', 'update']);
     Route::get('users/roles/{id}', 'Web\UsersController@getUserByRole');
+    Route::get('users/view/upload', 'Web\UsersController@viewUploadUser');
+    Route::post('upload/file/users', 'Web\UsersController@uploadUserFile');
 
     /** Roles */
     Route::resource('roles', 'Web\RolesController')->except(['show','edit', 'create', 'destroy', 'update', 'store']);
@@ -81,6 +83,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     /** Datatable */
+    Route::get('list/users', 'Web\UsersController@listUsers')->name('list.users');
     Route::get('list/complaints', 'Web\ComplaintsController@listComplaints')->name('list.complaints');
     Route::get('list/visitors', 'Web\VisitorController@listVisitors')->name('list.visitors');
     Route::get('list/orders', 'Web\OrderController@listOrder')->name('list.orders');

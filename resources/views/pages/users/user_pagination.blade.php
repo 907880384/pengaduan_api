@@ -1,33 +1,15 @@
-<div  class="table-responsive-md">
-  <table  class="table table-sm table-striped table-hover table-bordered">
-    <thead>
-      <tr class="text-center bg-primary text-white">
-        <th>#</th>
-        <th>Nama</th>
-        <th>Username</th>
-        <th>Roles</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      
-      @foreach ($records as $key => $row)
-        <tr>
-          <td class="text-center">{{ $key + $records->firstItem() }}</td>
-          <td>{{ $row->name }}</td>
-          <td>{{ $row->username }}</td>
-          <td class="text-center">
-            {{ implode(' ', array_map('ucfirst', explode('-', $row->roles()->first()->slug))) }}
-          </td>
-          <td class="text-center">
-            <button type="button" class="btn btn-danger btn-sm" onclick="deleteRow('{{ $row->id }}')">
-              <i class="fas fa-trash"></i> HAPUS
-            </button>
-          </td>
+<div class="col-12 col-lg-12 col-md-12 col-sm-12">
+  <div class="table-responsive">
+    <table id="userTable" class="table table-bordered table-hover nowrap table-sm" width="100%">
+      <thead>
+        <tr class="text-center bg-primary text-white">
+          <th>NO</th>
+          <th>NAMA</th>
+          <th>USERNAME</th>
+          <th>ROLES</th>
+          <th>ACTION</th>
         </tr>
-      @endforeach
-    </tbody>
-  </table>
+      </thead>
+    </table>
+  </div>
 </div>
-
-{{ $records->links('customs.pagination') }}

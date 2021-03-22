@@ -14,12 +14,14 @@
     </ul>
   </form>
   <ul class="navbar-nav navbar-right">
+    @if (strtolower(auth()->user()->roles()->first()->slug) != 'developer')
     <li class="dropdown dropdown-list-toggle">
       <a href="#" type="button" class="btn btn-primary">
         <i class="fas fa-shopping-cart"></i> 
         <span id="totalOrder" class="badge badge-danger"></span>
       </a>
     </li>
+    
 
     <li class="dropdown dropdown-list-toggle">
       <a id="notifications" class="nav-link nav-link-lg" data-toggle="dropdown">
@@ -45,7 +47,7 @@
         </div>
       </div>
     </li>
-
+    @endif
 
     <li class="dropdown">
       <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">

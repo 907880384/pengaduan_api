@@ -7,20 +7,50 @@
       <a href="index.html">APP</a>
     </div>
     <ul class="sidebar-menu">
-      @foreach (routerCollections() as $r)
+      @if (strtolower(auth()->user()->roles()->first()->slug) == 'developer')
+        <li class="menu-header">
+          Dashboard
+        </li>
+        <li class="nav-item dropdown">
+          <a href="{{ url('/dashboard') }}" class="nav-link">
+            <i class="fas fa-fire"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
 
-        @if (count($r['slug']) > 0)
-          
-          @if (in_array(Auth::user()->roles()->first()->slug, $r['slug']))
-            <li class="menu-header">
-              {{ $r['label'] }}
-            </li>
+        <li class="menu-header">
+          Master
+        </li>
+        <li class="nav-item dropdown">
+          <a href="{{ url('/users') }}" class="nav-link">
+            <i class="fas fa-user"></i>
+            <span>Pengguna</span>
+          </a>
+        </li>
+      @else
+        @foreach (routerCollections() as $r)
 
-            <!-- Count Route > 0 -->
-            @foreach ($r['components'] as $c)
-              @if (count($c['to']) > 0)
-                
-                @if (in_array(Auth::user()->roles()->first()->slug, $c['to']))
+          @if (count($r['slug']) > 0)
+            
+            @if (in_array(Auth::user()->roles()->first()->slug, $r['slug']))
+              <li class="menu-header">
+                {{ $r['label'] }}
+              </li>
+
+              <!-- Count Route > 0 -->
+              @foreach ($r['components'] as $c)
+                @if (count($c['to']) > 0)
+                  
+                  @if (in_array(Auth::user()->roles()->first()->slug, $c['to']))
+                    <li class="nav-item dropdown">
+                      <a href="{{ url($c['route']) }}" class="nav-link">
+                        <i class="{{ $c['icon'] }}"></i>
+                        <span>{{ $c['title'] }}</span>
+                      </a>
+                    </li>
+                  @endif
+
+                @else
                   <li class="nav-item dropdown">
                     <a href="{{ url($c['route']) }}" class="nav-link">
                       <i class="{{ $c['icon'] }}"></i>
@@ -28,36 +58,28 @@
                     </a>
                   </li>
                 @endif
+              @endforeach
+            @endif
 
-              @else
-                <li class="nav-item dropdown">
-                  <a href="{{ url($c['route']) }}" class="nav-link">
-                    <i class="{{ $c['icon'] }}"></i>
-                    <span>{{ $c['title'] }}</span>
-                  </a>
-                </li>
-              @endif
+          @else
+            <li class="menu-header">
+              {{ $r['label'] }}
+            </li>
+
+            @foreach ($r['components'] as $c)
+              <li class="nav-item dropdown">
+                <a href="{{ url($c['route']) }}" class="nav-link">
+                  <i class="{{ $c['icon'] }}"></i>
+                  <span>{{ $c['title'] }}</span>
+                </a>
+              </li>
             @endforeach
           @endif
 
-        @else
-          <li class="menu-header">
-            {{ $r['label'] }}
-          </li>
+          
 
-          @foreach ($r['components'] as $c)
-            <li class="nav-item dropdown">
-              <a href="{{ url($c['route']) }}" class="nav-link">
-                <i class="{{ $c['icon'] }}"></i>
-                <span>{{ $c['title'] }}</span>
-              </a>
-            </li>
-          @endforeach
-        @endif
-
-        
-
-      @endforeach
+        @endforeach
+      @endif
       </ul>
 
       <div class="mt-4 mb-4 p-3 hide-sidebar-mini">

@@ -5,11 +5,22 @@
   <div class="section-header">
     <h1>Master Pengguna</h1>
     <div class="section-header-breadcrumb">
+      @if (auth()->user()->roles()->first()->slug == 'developer')
+      <div class="breadcrumb-item">
+        <a href="{{ url('users/view/upload') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-file-import"></i> IMPORT FILE USER
+        </a>
+      </div>
+      @endif
+
+      @if (auth()->user()->roles()->first()->slug == 'admin')
       <div class="breadcrumb-item">
         <a href="{{ url('users/create') }}" class="btn btn-primary btn-sm">
           <i class="fas fa-plus"></i> TAMBAH PENGGUNA
         </a>
       </div>
+      @endif
+      
     </div>
   </div>
 
@@ -61,10 +72,8 @@
 
             <div class="row">&nbsp;</div>
 
-            <div class="row">
-              <div id="tableUser" class="col-md-12 col-12 col-lg-12">
-                @include('pages.users.user_pagination')
-              </div>
+            <div class="row p-3">
+              @include('pages.users.user_pagination')
             </div>
             
           </div>
@@ -77,91 +86,107 @@
 @endsection
 
 @push('scripts')
-  <script>
+<script>
+  var userTable = 'userTable';
 
-    const urlDestroy = "{!! url('/users') !!}";
-    const urlBackTo = "{!! url('/users') !!}"
-    const urlPagination = "{!! url('/users') !!}"
+  const urlUser = "{!! url('/users') !!}";
 
-    function parseQueryString() {
-      var str = window.location.search;
-      var objURL = {};
-      
-      str.replace(new RegExp( "([^?=&]+)(=([^&]*))?", "g" ), ( $0, $1, $2, $3 ) => {
-        objURL[ $1 ] = $3;
-      });
-      return objURL;
-    };
+  function setDatatable(tableName , filter = null) {
+    tableName = '#' + tableName;
 
-    function deleteRow(id) {
-      const url = urlDestroy + "/" + id;
-      Swal.fire({
-        title: 'DELETE ROW',
-        text: 'Anda yakin ingin menghapus data ini ?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Ya, Hapus!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.delete(url).then((response) => {
-            const {data, status} = response;
-            if(status == 200) {
-              Swal.fire({
-                title: 'SUCCESS',
-                text: data.message,
-                confirmButtonText: `OK`,
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href = urlBackTo
-                }
-              })
-            }
-          }).catch((error) => {
-            console.log(error.response);
-          });
-        }
-      })
+    if($.fn.DataTable.isDataTable(tableName) ) {
+      $(tableName).DataTable().destroy();
     }
 
-    function filterDatatable(page) {
-      const filterSearch = $("#filterSearch").val();
-      const filterRole = $("#filterRole").val();
-
-      $.ajax({
-        type: "GET",
-        url: urlPagination + '?page=' + page + '&filterRole=' + filterRole + '&filterSearch=' + filterSearch,
-        success: function (data) {
-          console.log("Render Data", data)
-          $("#tableUser").html(data);
-        }
-      });
-      console.log({page, filterSearch, filterRole});
-    }
-
-    function refreshDatatable() {
-      $('select[name="filterRole"]').val('');
-      $("#filterSearch").val('')
-      filterDatatable(1)
-    }
-
-
-    $(function () {
-      $(document).on('click', '.pagination a',function(event)
-      {
-        event.preventDefault();
-        var hrefPage = $(this).attr('href');
-        var page = 1;
-
-        if(hrefPage != '#' && hrefPage != '') {
-          page = parseInt($(this).attr('href').split('page=')[1]);
-        }
-
-        filterDatatable(page)
-
-      });
+    var table = $(tableName).DataTable({
+      processing: true,
+      serverSide: true,
+      searching: false,
+      destroy: true,
+      ordering: false,
+      ajax: {
+        "url": "{{ route('list.users') }}",
+        "data": function (d) {
+          if(filter != null) {
+            d.filterRole = filter.filterRole;
+            d.filterSearch = filter.filterSearch;
+          }          
+        }   
+      },
+      columns: [
+        {data: 'DT_RowIndex',  name: 'DT_RowIndex', className: 'text-center'},
+        {data: 'name', name: 'name'},
+        {data: 'username', name: 'username', className:'text-center', render: function(data) { return `<b>${data}</b>`}},
+        {data: 'role_name', name: 'role_name'},
+        {data: 'action',name: 'action', className:'text-center'},
+      ],
+      "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
     });
 
-  </script>
+  }
+
+  function filterDatatable() {
+    const filter = {
+      filterRole: $("#filterRole").val(),
+      filterSearch: $("#filterSearch").val()
+    }
+
+    console.log(filter);
+
+    setDatatable(userTable, filter)
+  }
+
+  function refreshDatatable() {
+    $('select[name="filterRole"]').val('');
+    $("#filterSearch").val('')
+    setDatatable(userTable)
+  }
+
+  function parseQueryString() {
+    var str = window.location.search;
+    var objURL = {};
+    
+    str.replace(new RegExp( "([^?=&]+)(=([^&]*))?", "g" ), ( $0, $1, $2, $3 ) => {
+      objURL[ $1 ] = $3;
+    });
+    return objURL;
+  };
+
+  function deleteRow(id) {
+    const url = urlUser + "/" + id;
+    Swal.fire({
+      title: 'DELETE ROW',
+      text: 'Anda yakin ingin menghapus data ini ?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Ya, Hapus!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axios.delete(url).then((response) => {
+          const {data, status} = response;
+          if(status == 200) {
+            Swal.fire({
+              title: 'SUCCESS',
+              text: data.message,
+              confirmButtonText: `OK`,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                window.location.href = urlUser
+              }
+            })
+          }
+        }).catch((error) => {
+          console.log(error.response);
+        });
+      }
+    })
+  }
+
+  $(function () {
+    setDatatable(userTable);
+  });
+
+</script>
 @endpush
