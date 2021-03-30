@@ -16,7 +16,11 @@ class RolesController extends Controller
     }
 
     public function getOperationalRoles() {
-        $results = Role::where('slug', '!=', 'admin')->where('slug', '!=', 'customer')->get();
+        $results = Role::where('slug', '!=', 'admin')
+            ->where('slug', '!=', 'customer')
+            ->where('slug', '!=', 'developer')
+            ->where('slug', '!=', 'receptionis')
+            ->get();
         return response($results, 200);
     }
 

@@ -121,7 +121,11 @@ class ComplaintsController extends Controller
 
 
     public function create() {
-        $roles = Role::where('id', '!=', 1)->where('id', '!=', 2)->get();
+        $roles = Role::where('slug', '!=', 'admin')
+            ->where('slug', '!=', 'developer')
+            ->where('slug', '!=', 'customer')
+            ->where('slug', '!=', 'receptionis')
+            ->get();
         return view('pages.complaints.create', compact('roles'));
     }
 

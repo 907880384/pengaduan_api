@@ -144,20 +144,22 @@
       return text;
     }
 
-    function cartCount() {
+
+    async function cartCount() {
       const urlCart = "{{ url('count/new/orders') }}"
-      axios.get(urlCart).then((response) => {
-        const {data, status} = response;
+      try {
+        const {data, status} = await axios.get(urlCart);
+
         if(status == 200) {
-          localStorage.setItem('totalOrder', data.totalOrder.toString());
+          readCartCount(data.totalOrder)
+          localStorage.setItem('totalOrder', data.totalOrder);
         }
-      }).catch((error) => {
+      } catch (error) {
         console.log(error.response);
-      });
+      }
     }
 
-    function readCartCount() {
-      const total = localStorage.getItem('totalOrder')
+    function readCartCount(total = 0) {
       $("#totalOrder").text(total)
     }
 
@@ -168,7 +170,6 @@
 
       initNotification(authUser.id)
       cartCount();
-      readCartCount();
 
       socket.on('connect', () => {
         socket.emit('sendUserLogin', authUser.id);
@@ -240,12 +241,10 @@
       socket.on(globalBroadcast.event.cartOrder.channelName.add + ":" +  globalBroadcast.event.cartOrder.eventName, (message) => {
         console.log(`${globalBroadcast.event.cartOrder.channelName.add}`, message);
         const {receivers} = message;
-        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
 
         if(userRole.slug == receivers) {
           totalOrder += 1
-          localStorage.setItem('totalOrder', totalOrder);
-          readCartCount()
+          readCartCount(totalOrder)
         }
       });
 
@@ -253,12 +252,14 @@
       socket.on(globalBroadcast.event.cartOrder.channelName.agree + ":" + globalBroadcast.event.cartOrder.eventName, (message) => {
         console.log(`${globalBroadcast.event.cartOrder.channelName.agree}`, message);
         const {receivers} = message;
-        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
+        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(
+          localStorage.getItem('totalOrder')
+        ) : 0;
 
         if(receivers == authUser.id) {
-          totalOrder -= 1;
+          totalOrder = totalOrder - 1;
           localStorage.setItem('totalOrder', totalOrder);
-          readCartCount()
+          readCartCount(totalOrder)
         }
       });
 
@@ -266,12 +267,14 @@
       socket.on(globalBroadcast.event.cartOrder.channelName.disagree + ":" + globalBroadcast.event.cartOrder.eventName, (message) => {
         console.log("MESSAGE", message);
         const {receivers} = message;
-        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(localStorage.getItem('totalOrder')) : 0;
+        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(
+          localStorage.getItem('totalOrder')
+        ) : 0;
 
         if(receivers == authUser.id) {
-          totalOrder -= 1;
+          totalOrder = totalOrder - 1;
           localStorage.setItem('totalOrder', totalOrder);
-          readCartCount()
+          readCartCount(totalOrder)
         }
       });
 

@@ -16,7 +16,7 @@
   <ul class="navbar-nav navbar-right">
     @if (strtolower(auth()->user()->roles()->first()->slug) != 'developer')
     <li class="dropdown dropdown-list-toggle">
-      <a href="#" type="button" class="btn btn-primary">
+      <a href="{{ url('list/cart/orders') }}" type="button" class="btn btn-primary">
         <i class="fas fa-shopping-cart"></i> 
         <span id="totalOrder" class="badge badge-danger"></span>
       </a>

@@ -1,5 +1,9 @@
 @extends('layouts.backend')
 
+@section('baseStyles')
+  <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.2/css/rowGroup.dataTables.min.css">
+@endsection
+
 @section('content')
 <section class="section">
   <div class="section-header">
@@ -7,7 +11,7 @@
   </div>
 
   <div class="section-body">
-    <h2 class="section-title">List Pemesanan Barang</h2>
+    <h2 class="section-title">Pemesanan Barang</h2>
     <div class="row">
       <div class="col-12 col-lg-12 col-md-12">
         <div class="card">
@@ -41,6 +45,7 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
 <script>
 
 var thisTable = 'orderTable';
@@ -74,14 +79,7 @@ function setDatatable(tableName , filter = null) {
       }   
     },
     columns: [
-      {data: 'DT_RowIndex',  name: 'DT_RowIndex', className: 'text-center'},
-      {
-        data: 'product_id', 
-        name: 'product_id', 
-        render: function(data, type, row) {
-          return row.product.product_name;
-        }
-      },
+      { data: 'product_name', name: 'product_name' },
       {
         data: 'user', 
         name: 'user', 
@@ -126,8 +124,6 @@ function setDatatable(tableName , filter = null) {
               return `<span class="badge badge-warning">${data}</span>`
             }
           }
-
-          
         }
       },
       {
@@ -139,7 +135,27 @@ function setDatatable(tableName , filter = null) {
       },
       {data: 'action',name: 'action', className: 'text-center'}
     ],
-    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+    rowGroup: {
+      startRender: null,
+      endRender: function(rows, group) {
+        console.log("Group", group)
+
+        var sumQty = rows.data().pluck('quantity').reduce(function(a, b) {
+          return a + b * 1;
+        })
+      
+        return $('<tr/>')
+          .append( '<td colspan="2">Total Pemesanan</td>' )
+          .append( '<td class="text-center"><b>'+ sumQty +'</b></td>' )
+          .append( '<td/>' )
+          .append( '<td/>' )
+          .append( '<td/>' )
+          .append( '<td/>' )
+          .append( '<td/>' )
+      },
+      dataSrc: 'product_name'
+    }
   });
 
 }

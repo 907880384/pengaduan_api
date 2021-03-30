@@ -63,6 +63,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('count/new/orders', 'Web\OrderController@countNewOrder');
     Route::get('orders/agreed/{id}', 'Web\OrderController@agreed');
     Route::post('orders/disagree', 'Web\OrderController@disagree');
+    Route::get('list/cart/orders', 'Web\OrderController@showListCart');
+
 
     /** Activities */
     Route::group(['prefix' => 'activities'], function () {

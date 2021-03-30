@@ -82,7 +82,8 @@ class OrderController extends Controller
         }
 
         if($product->stock >= $req->quantity) {
-            $product->stock = $product->stock - $req->quantity;
+            $stock = (int) $product->stock - (int) $req->quantity;
+            $product->stock = $stock;
             $product->save();
         }
         else {

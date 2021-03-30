@@ -14,7 +14,9 @@ class Order extends Model
         'order_date',
         'is_agree',
         'agree_date',
-        'user_agree_id'
+        'user_agree_id',
+        'reasons',
+        'is_disagree'
     ];
 
     public function product()

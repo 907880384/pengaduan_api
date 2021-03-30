@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\Product;
 use App\Events\OrdersCartEvent;
+use DB;
 use Auth;
 use DataTables;
 
@@ -31,6 +32,9 @@ class OrderController extends Controller
         $records->orderBy('order_date', 'desc')->get();
 
         return Datatables::of($records)->addIndexColumn()
+            ->addColumn('product_name', function($row) {
+                return $row->product->product_name;
+            })
             ->addColumn('status', function($row) {
                 if($row->is_agree) {
                     return 'DISETUJUI';
@@ -62,7 +66,9 @@ class OrderController extends Controller
     }
 
     public function countNewOrder() {
-        $totalOrder = Order::where('is_agree', false)->whereDate('order_date', \Carbon\ Carbon::today())->count();
+        $totalOrder = Order::where('is_agree', false)
+        ->where('is_disagree', false)
+        ->count();
 
         return response([
             'totalOrder' => $totalOrder
@@ -102,5 +108,39 @@ class OrderController extends Controller
 
     public function agreed($id) {
         
+    }
+
+    public function showListCart() {
+
+        $product_id = request()->query('product_id');
+
+        $orders = Order::with([
+            'agreeter',
+            'user',
+            'complaint',
+            'product'
+        ])->where('is_agree', false)->where('is_disagree', false);
+
+        if($product_id != '-' && $product_id != '') {
+            $orders = $orders->where('product_id', $product_id);
+        }
+
+        $orders = $orders->orderBy('created_at', 'desc')->paginate(10);
+        
+        $orders->getCollection()->transform(function($query) {
+            $query->productFiles = \App\Models\ProductFile::where('product_id', $query->product_id)->get();
+            return $query;
+        });    
+
+
+        $products = Order::select('product_id', 'products.product_name as product_name')
+        ->join('products', 'products.id', '=', 'orders.product_id')
+        ->groupBy('product_id')
+        ->get();
+
+        if(request()->ajax()) {
+            return view('pages.carts.carts', compact('orders'));
+        }
+        return view('pages.carts.list_cart', compact('orders', 'products'));
     }
 }
