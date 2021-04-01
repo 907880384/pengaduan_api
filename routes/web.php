@@ -51,7 +51,8 @@ Route::group(['middleware' => ['auth']], function () {
         'Web\ProductController', 
         ['only' => ['index', 'create', 'show', 'store',   'edit', 'destroy']]
     );
-
+    Route::get('products/view/upload', 'Web\ProductController@viewUpload');
+    Route::post('upload/file/products', 'Web\ProductController@uploadProducts');
     Route::post('products/{id}', 'Web\ProductController@update');
 
     /** Orders */

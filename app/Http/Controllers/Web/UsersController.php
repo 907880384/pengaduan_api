@@ -225,14 +225,18 @@ class UsersController extends Controller
     }
 
     public function insertUserArray($data) {
-        foreach ($data as $value) {
-            $password = $value[2] != null && !empty($value[2]) ? $value[2] : '12345678';
-            $user = User::create([
-                'name' => $value[0],
-                'username' => $value[1],
-                'password' =>  bcrypt($password),
-            ]);
-            $user->roles()->attach(Role::where('slug',$value[3])->first());
-        }
+
+        collect($data)->chunk(5)->each(function($collections) {
+
+            foreach ($collections as $value) {
+                $password = $value[2] != null && !empty($value[2]) ? $value[2] : '12345678';
+                $user = User::create([
+                    'name' => $value[0],
+                    'username' => $value[1],
+                    'password' =>  bcrypt($password),
+                ]);
+                $user->roles()->attach(Role::where('slug',$value[3])->first());
+            }
+        });
     }
 }

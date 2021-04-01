@@ -1,13 +1,17 @@
 @if (count($records) > 0)
-<div class="row">
+<div class="row m-auto">
   @foreach ($records as $key => $row)
-  <div class="col-12 col-sm-6 col-md-6 col-lg-3 mt-1 shadow-dark">
+  <div class="col-12 col-sm-6 col-md-6 col-lg-3 mt-3 shadow-dark text-center">
     <article class="article article-style-b">
-      <div class="article-header">
+      <div class="article-header p-3">
         @if (count($row->fileImages) > 0)
-        <div class="article-image" data-background="{{ asset('storage/'. $row->fileImages[0]->filepath) }}"></div>
+        <div class="article-image">
+          <img src="{{ asset('storage/'. $row->fileImages[0]->filepath) }}" class="article-image" />
+        </div>
         @else
-        <div class="article-image" data-background="{{ asset('images/img01.jpg') }}"></div>
+        <div class="article-image">
+          <img src="{{ asset('images/img01.jpg') }}" class="article-image" />
+        </div>
         @endif
       </div>
       <div class="article-details">

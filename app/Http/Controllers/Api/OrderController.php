@@ -51,6 +51,7 @@ class OrderController extends Controller
         ->where('is_agree', false)
         ->where('is_disagree', false)
         ->where('user_id', $user->id)
+        ->whereDate('order_date', \Carbon\Carbon::today())
         ->orderBy('order_date', 'DESC')
         ->get();
 

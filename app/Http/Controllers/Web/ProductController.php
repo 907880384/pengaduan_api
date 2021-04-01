@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\ProductFile;
+use App\Imports\ProductImport;
 use Helper;
 use Storage;
+use File;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
@@ -35,7 +38,7 @@ class ProductController extends Controller
 
 
         $records = $records->orderBy('updated_at', 'desc')->paginate($this->page);
-
+        
         if(request()->ajax()) {
             return view('pages.products.datatable', compact('records'));
         }
@@ -228,5 +231,96 @@ class ProductController extends Controller
         $product->delete();
 
         return $this->sendResponse(Helper::messageResponse()->PRODUCT_DELETE_SUCCESS, 200); 
+    }
+
+    /** VIEW UPLOAD FILE BARANG */
+    public function viewUpload() {
+        return view('pages.products.upload_product');
+    }
+
+    /** UPLOAD BARANG */
+    public function uploadProducts(Request $req) {
+        $req->validate([
+            'productFile' => 'required'
+        ]);
+
+        $extension = File::extension($req->file('productFile')->getClientOriginalName());
+        
+        if($extension == 'xlsx' || $extension == 'xls') {
+            $rows = Excel::toArray(new ProductImport, $req->file('productFile'));
+
+            $errors = [];
+            $success = [];
+
+            foreach ($rows[0] as $key => $value) {
+                
+                if($key > 0) {
+                    if($value[0] != null && !empty($value[0])) {
+                        if($this->compareProduct($value[0], $value[1]) == true) {
+                            $errors[] = [
+                                $value[0], 
+                                $value[1], 
+                                $value[2], 
+                                $value[3]
+                            ];
+                        }
+                        else {
+                            $success[] = [
+                                $value[0], 
+                                $value[1], 
+                                $value[2], 
+                                $value[3]
+                            ];
+                        }
+                    }                  
+                }
+
+            }
+
+            $results = [
+                'success' => false,
+                'message' => null,
+            ];
+
+            if(count($success) > 0) {
+                $this->insertProductArray($success);
+
+                if(count($errors) > 0) {
+                    $results['message'] = 'Beberapa data barang berhasil disimpan';
+                }
+                else {
+                    $results['success'] = true;
+                    $results['message'] = 'Data pengguna berhasil disimpan';
+                }
+
+            }
+            else {
+                $results['message'] = 'Data pengguna berhasil disimpan';
+            }
+
+            return response(array_merge($results, [
+                'errorData' => $errors,
+                'successData' => $success
+            ]) ,200);
+        }
+
+    }
+
+    private function compareProduct($name, $spesification) {
+        $product = Product::where('product_name', $name)->where('spesification', $spesification)->first();
+        return $product ? true: false;
+    }
+
+    private function insertProductArray($data) {
+        collect($data)->chunk(10)->each(function($collections) {
+            foreach ($collections as $value) {
+                Product::create([
+                    'product_name' => $value[0],
+                    'spesification' => $value[1],
+                    'stock' => $value[2],
+                    'satuan' => $value[3],
+                ]);
+            }
+        });
     }
 }

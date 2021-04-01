@@ -5,12 +5,17 @@
   <div class="section-header">
     <h1>Informasi Data Barang</h1>
     <div class="section-header-breadcrumb">
-      @if (strtolower(Auth::user()->roles()->first()->slug) == 'admin')
+      @if (strtolower(Auth::user()->roles()->first()->slug) == 'developer')
       <div class="breadcrumb-item">
         <a href="{{ url('/products/create') }}" class="btn btn-primary btn-sm">
           <i class="fas fa-plus"></i> TAMBAH BARANG
         </a>
+
+        <a href="{{ url('products/view/upload') }}" class="btn btn-primary btn-sm">
+          <i class="fas fa-file-import"></i> IMPORT FILE BARANG
+        </a>
       </div>
+
       @endif
     </div>
   </div>

@@ -27,6 +27,12 @@
             <span>Pengguna</span>
           </a>
         </li>
+        <li class="nav-item dropdown">
+          <a href="{{ url('/products') }}" class="nav-link">
+            <i class="fab fa-product-hunt"></i>
+            <span>Barang</span>
+          </a>
+        </li>
       @else
         @foreach (routerCollections() as $r)
 
