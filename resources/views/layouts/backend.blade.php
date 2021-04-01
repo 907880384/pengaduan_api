@@ -242,8 +242,13 @@
         console.log(`${globalBroadcast.event.cartOrder.channelName.add}`, message);
         const {receivers} = message;
 
+        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(
+          localStorage.getItem('totalOrder')
+        ) : 0;
+
         if(userRole.slug == receivers) {
-          totalOrder += 1
+          totalOrder = totalOrder + 1
+          localStorage.setItem('totalOrder', totalOrder);
           readCartCount(totalOrder)
         }
       });

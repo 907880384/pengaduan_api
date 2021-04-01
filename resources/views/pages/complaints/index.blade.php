@@ -1,5 +1,9 @@
 @extends('layouts.backend')
 
+@section('baseStyles')
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/css/gijgo.min.css" integrity="sha512-oCuecFHHGu/Y4zKF8IoSoj5hQq1dLNIiUCwN08ChNW1VoMcjIIirAJT2JmKlYde6DeLN6JRSgntz6EDYDdFhCg==" crossorigin="anonymous" />
+@endsection
+
 @section('content')
 <section class="section">
   <div class="section-header">
@@ -25,7 +29,16 @@
           <div class="card-body p-1">
             
             <div class="row m-2">
-              <div class="col-md-6">
+              <div class="col-md-8">
+                <div class="form-group row">
+                  <label for="changeDateComplaint" class="col-md-3 m-2">
+                    Tanggal Pengaduan
+                  </label>
+                  <div class="col-md-8">
+                    <input id="changeDateComplaint"  class="form-control" />
+                  </div>
+                </div>
+
                 <div class="form-group row">
                   <label for="sentences" class="col-md-3 m-2">
                     Aktivitas
@@ -38,18 +51,14 @@
                     </select>
                   </div>
                 </div>
-              </div>
 
-              <div class="col-md-6">
                 <div class="form-group row">
                   <label for="search" class="col-md-3 m-2">Pencarian</label>
                   <div class="col-md-8">
                     <input type="text" id="search" class="form-control" /> 
                   </div>
                 </div>
-              </div>
 
-              <div class="col-md-6">
                 <div class="form-group row">
                   <div class="col-md-8 offset-md-4 m-2">
                     <button type="button" class="btn btn-primary btn-sm" onclick="filterDatatable()">
@@ -61,7 +70,9 @@
                     </button>
                   </div>
                 </div>
+
               </div>
+
             </div>
 
             {{-- DATA TABLE --}}
@@ -123,165 +134,181 @@
 @endsection
 
 @push('scripts')
-  <script>
-    const urlBackTo = "{{ url('/complaints') }}"
-    const urlUsers = "{{ url('/users/roles') }}";
-    const urlAssigned = "{{ url('/assigned/complaints') }}";
-    const urlPagination = "{!! url('/complaints') !!}"
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/js/gijgo.min.js" integrity="sha512-T62eI76S3z2X8q+QaoTTn7FdKOVGjzKPjKNHw+vdAGQdcDMbxZUAKwRcGCPt0vtSbRuxNWr/BccUKYJo634ygQ==" crossorigin="anonymous"></script>
+<script>
+  const urlBackTo = "{{ url('/complaints') }}"
+  const urlUsers = "{{ url('/users/roles') }}";
+  const urlAssigned = "{{ url('/assigned/complaints') }}";
+  const urlPagination = "{!! url('/complaints') !!}"
 
-    function setDatatable(tableName, filter = null) {
-      tableName = '#' + tableName;
+  function setDatatable(tableName, filter = null) {
+    tableName = '#' + tableName;
 
-      if($.fn.DataTable.isDataTable(tableName) ) {
-        $(tableName).DataTable().destroy();
-      }
+    if($.fn.DataTable.isDataTable(tableName) ) {
+      $(tableName).DataTable().destroy();
+    }
 
-      var table = $(tableName).DataTable({
-      processing: true,
-      serverSide: true,
-      searching: false,
-      destroy: true,
-      ordering: false,
-      ajax: {
-        "url": "{{ route('list.complaints') }}",
-        "data": function (d) {
+    var table = $(tableName).DataTable({
+    processing: true,
+    serverSide: true,
+    searching: false,
+    destroy: true,
+    ordering: false,
+    ajax: {
+      "url": "{{ route('list.complaints') }}",
+      "data": function (d) {
 
-          console.log("Filter", filter);
+        console.log("Filter", filter);
 
-          if(filter == null) {
-            d.search = null;
-            d.sentences = null;
+        if(filter == null) {
+          d.search = null;
+          d.sentences = null;
+          d.complaintDate = ''
+        }
+        else {            
+          d.search = filter.search;
+          d.sentences = filter.sentences;
+          d.complaintDate = filter.complaintDate
+        }
+      }   
+    },
+    columns: [
+      {data: 'DT_RowIndex',  name: 'DT_RowIndex', className: 'text-center'},
+      {data: 'messages', name: 'messages'},
+      {
+        data: 'is_finished', 
+        name: 'is_finished', 
+        className: 'text-center',
+        render: function(data, type, row) {
+          console.log(row);
+          if (data)
+            return '<div class="badge badge-primary">SELESAI</div>';
+          else {
+            return '<div class="badge badge-secondary">BELUM SELESAI</div>';
           }
-          else {            
-            d.search = filter.search;
-            d.sentences = filter.sentences;
-          }
-        }   
+        }
       },
-      columns: [
-        {data: 'DT_RowIndex',  name: 'DT_RowIndex', className: 'text-center'},
-        {data: 'messages', name: 'messages'},
-        {
-          data: 'is_finished', 
-          name: 'is_finished', 
-          className: 'text-center',
-          render: function(data, type, row) {
-            console.log(row);
-            if (data)
-              return '<div class="badge badge-primary">SELESAI</div>';
-            else {
-              return '<div class="badge badge-secondary">BELUM SELESAI</div>';
-            }
-          }
-        },
-        {
-          data: 'sender_name', 
-          name: 'sender_name', 
-          className: 'text-center',
-          render: function(data) {
-            return `<b>${data}</b>`
-          }
-        },
-        {data: 'types_name', name: 'types_name', className: 'text-center'},
-        {
-          data: 'executor', 
-          name: 'executor', 
-          className: 'text-center',
-          render: function(data) {
-            return data != null ? '<b>' + data.name + '</b>' : '';
-          }
-        },
-        {data: 'action', name: 'action', className: 'text-center'}
-      ],
-      "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+      {
+        data: 'sender_name', 
+        name: 'sender_name', 
+        className: 'text-center',
+        render: function(data) {
+          return `<b>${data}</b>`
+        }
+      },
+      {data: 'types_name', name: 'types_name', className: 'text-center'},
+      {
+        data: 'executor', 
+        name: 'executor', 
+        className: 'text-center',
+        render: function(data) {
+          return data != null ? '<b>' + data.name + '</b>' : '';
+        }
+      },
+      {data: 'action', name: 'action', className: 'text-center'}
+    ],
+    "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
+  });
+
+  }
+
+  function setSelect2(data, select, option = null) {
+    let records = [];
+    $.each(data, function (i, v) {
+      records.push({id: v.id, text: v.name + ' - ' + v.roles[0].name});
     });
 
+    select.empty();
+    select.append(new Option());
+    
+    select.select2({
+      dropdownParent: $('#modalAssign'),
+      data: records,
+      placeholder: "User Operational",
+      allowClear: true,
+    });
+
+    if(option != null) {
+      select.val(option).trigger('change');
     }
+  }
 
-    function setSelect2(data, select, option = null) {
-      let records = [];
-      $.each(data, function (i, v) {
-        records.push({id: v.id, text: v.name + ' - ' + v.roles[0].name});
-      });
+  function showAssignModal(id, role_id) {
+    console.log("Role ID", role_id);
+    $("#modalAssign").modal('show');
+    $("#buttonAssign").attr('data-id', id);
 
-      select.empty();
-      select.append(new Option());
-      
-      select.select2({
-        dropdownParent: $('#modalAssign'),
-        data: records,
-        placeholder: "User Operational",
-        allowClear: true,
-      });
-
-      if(option != null) {
-        select.val(option).trigger('change');
+    axios.get(urlUsers + '/' + role_id).then((response) => {
+      console.log(response);
+      if(response.status === 200) {
+        const {users} = response.data;
+        setSelect2(users, $("#selectAssign"), null);
       }
-    }
+    }).catch((err) => {
+      console.log(err.response);
+    });
+  }
 
-    function showAssignModal(id, role_id) {
-      console.log("Role ID", role_id);
-      $("#modalAssign").modal('show');
-      $("#buttonAssign").attr('data-id', id);
+  function filterDatatable(page) {
+    const filters = {
+      sentences: $('#sentences').val(),
+      search: $('#search').val(),
+      complaintDate: $('#changeDateComplaint').val()
+    };
 
-      axios.get(urlUsers + '/' + role_id).then((response) => {
+    console.log("Filters", filters);
+
+    setDatatable('complaintTable', filters);
+  }
+
+  function refreshDatatable() {
+    $('select[name="sentences"]').val('all');
+    $("#search").val('')
+    setDatatable('complaintTable')
+  }
+
+  $(function () {
+
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed);
+
+    $('#changeDateComplaint').datepicker({
+      uiLibrary: 'bootstrap4',
+      value: today.toLocaleDateString(),
+    });
+
+    setDatatable('complaintTable')
+
+
+    $("#buttonAssign").click(function (e) { 
+      e.preventDefault();
+      const data = {
+        complaint_id: $(this).attr('data-id'),
+        executor_id: $("#selectAssign").val()
+      }
+      console.log(data);
+      
+
+      axios.post(urlAssigned, data).then((response) => {
         console.log(response);
-        if(response.status === 200) {
-          const {users} = response.data;
-          setSelect2(users, $("#selectAssign"), null);
+        const {data, status} = response;
+        if(status === 200) {
+          Swal.fire({
+            title: 'SUCCESS',
+            text: data.message,
+            confirmButtonText: `OK`,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              $("#modalAssign").modal('hide');
+              window.location.href = urlBackTo
+            }
+          })
         }
       }).catch((err) => {
         console.log(err.response);
-      });
-    }
-
-    function filterDatatable(page) {
-      setDatatable('complaintTable', {
-        sentences: $('#sentences').val(),
-        search: $('#search').val(),
-      });
-    }
-
-    function refreshDatatable() {
-      $('select[name="sentences"]').val('all');
-      $("#search").val('')
-      setDatatable('complaintTable')
-    }
-
-    $(function () {
-
-      setDatatable('complaintTable')
-
-
-      $("#buttonAssign").click(function (e) { 
-        e.preventDefault();
-        const data = {
-          complaint_id: $(this).attr('data-id'),
-          executor_id: $("#selectAssign").val()
-        }
-        console.log(data);
-        
-
-        axios.post(urlAssigned, data).then((response) => {
-          console.log(response);
-          const {data, status} = response;
-          if(status === 200) {
-            Swal.fire({
-              title: 'SUCCESS',
-              text: data.message,
-              confirmButtonText: `OK`,
-            }).then((result) => {
-              if (result.isConfirmed) {
-                $("#modalAssign").modal('hide');
-                window.location.href = urlBackTo
-              }
-            })
-          }
-        }).catch((err) => {
-          console.log(err.response);
-        })
-      });
-
+      })
     });
-  </script>
+
+  });
+</script>
 @endpush

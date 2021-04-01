@@ -15,14 +15,14 @@
       <div class="form-group row">
         <label for="filterStatus" class="col-md-2 m-2">Filter Tanggal</label>
         <div class="col-md-4">
-          <input id="changeDate"  width="280" style="height: 30px; margin-right: 5p;" />
+          <input id="changeDate"  class="form-control" />
         </div>
         <div class="col-md-3">
-          <button type="button" class="btn btn-primary btn-sm" onclick="filterDate()">
+          <button type="button" class="btn btn-primary" onclick="filterDate()">
             Filter
           </button>
       
-          <button type="button" class="btn btn-success btn-sm" onclick="refreshDate()">
+          <button type="button" class="btn btn-success" onclick="refreshDate()">
             Refresh
           </button>
         </div>

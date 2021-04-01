@@ -113,6 +113,7 @@ class OrderController extends Controller
     public function showListCart() {
 
         $product_id = request()->query('product_id');
+        $filter_date = request()->query('filter_date');
 
         $orders = Order::with([
             'agreeter',
@@ -123,6 +124,10 @@ class OrderController extends Controller
 
         if($product_id != '-' && $product_id != '') {
             $orders = $orders->where('product_id', $product_id);
+        }
+
+        if($filter_date != '') {
+            $orders = $orders->whereDate('order_date', \Carbon\Carbon::parse($filter_date)->format('Y-m-d'));
         }
 
         $orders = $orders->orderBy('created_at', 'desc')->paginate(10);
@@ -141,6 +146,6 @@ class OrderController extends Controller
         if(request()->ajax()) {
             return view('pages.carts.carts', compact('orders'));
         }
-        return view('pages.carts.list_cart', compact('orders', 'products'));
+        return view('pages.carts.list_cart', compact('products', 'orders'));
     }
 }

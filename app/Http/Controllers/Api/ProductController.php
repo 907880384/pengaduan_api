@@ -11,7 +11,6 @@ use Auth;
 
 class ProductController extends Controller
 {
-    private $page = 4;
 
 
     private function sendResponse($msg, $status=200) {
@@ -28,14 +27,14 @@ class ProductController extends Controller
         $products = Product::with(['fileImages']);
 
         if($types == 'name' && $search != '') {
-            $products = $products->where('product_name', 'like', '%'.$search.'%');
+            $products->where('product_name', 'like', '%'.$search.'%');
         }
 
         if($types == 'spesification' && $search != '') {
-            $products = $products->where('spesification', 'like', '%'.$search.'%');
+            $products->where('spesification', 'like', '%'.$search.'%');
         }
 
-        $products = $products->orderBy('updated_at', 'desc')->paginate($this->page);
+        $products = $products->orderBy('updated_at', 'desc')->paginate(10);
 
         $products->data = $products->getCollection()->transform(function($query) {
             if(count($query->fileImages) > 0) {

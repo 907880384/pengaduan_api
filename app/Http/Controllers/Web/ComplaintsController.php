@@ -49,6 +49,7 @@ class ComplaintsController extends Controller
 
         $search = '';
         $sentences = 'all';
+        $complaintDate = $req->query('complaintDate');
 
         if($req->query('search') != null) {
             $search = $req->query('search');
@@ -57,6 +58,7 @@ class ComplaintsController extends Controller
         if($req->query('sentences') != null) {
             $sentences = $req->query('sentences');    
         }
+
 
         if($sentences) {
             switch ($sentences) {
@@ -84,6 +86,10 @@ class ComplaintsController extends Controller
                 $q->where('executor_id', $user->id);
             });
         }
+
+        $records = $records->whereDate(
+            'created_at', \Carbon\Carbon::parse($complaintDate)->format('Y-m-d')
+        );
 
         $records = $records->orderBy('updated_at', 'desc')->get();
 

@@ -2,6 +2,7 @@
 
 @section('baseStyles')
 <link rel="stylesheet" href="{{ asset('css/carts.css') }}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/css/gijgo.min.css" integrity="sha512-oCuecFHHGu/Y4zKF8IoSoj5hQq1dLNIiUCwN08ChNW1VoMcjIIirAJT2JmKlYde6DeLN6JRSgntz6EDYDdFhCg==" crossorigin="anonymous" />
 @endsection
 
 @section('content')
@@ -36,6 +37,9 @@
                       <hr>
                       
                       <form>
+                        <p>Tanggal Pemesanan</p>
+                        <input id="changeDate"  class="form-control"  />
+
                         <p>Nama Barang</p> 
                         <select id="selectProductOption">
                           <option value="-">Semuanya</option>
@@ -68,16 +72,18 @@
 
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/js/gijgo.min.js" integrity="sha512-T62eI76S3z2X8q+QaoTTn7FdKOVGjzKPjKNHw+vdAGQdcDMbxZUAKwRcGCPt0vtSbRuxNWr/BccUKYJo634ygQ==" crossorigin="anonymous"></script>
 <script>
 
 const urlApi = "{!! url('/list/cart/orders') !!}"
 
 function setDatatable(page) {
   const product_id = $('#selectProductOption').val();
-
+  const filter_date = $('#changeDate').val();
+  console.log(filter_date)
   $.ajax({
     type: "GET",
-    url: urlApi + '?page=' + page + '&product_id=' + product_id,
+    url: urlApi + '?page=' + page + '&product_id=' + product_id + '&filter_date=' + filter_date,
     success: function (data) {
       $("#cartOrder").html(data);
     }
@@ -87,8 +93,6 @@ function setDatatable(page) {
 function filterCarts() {
   var hrefPage = $(this).attr('href');
   var page = 1;
-
-  console.log(hrefPage);
 
   if(hrefPage != '#' && hrefPage != '' && hrefPage != undefined) {
     page = parseInt($(this).attr('href').split('page=')[1]);
@@ -108,6 +112,15 @@ function setDisagree(id) {
 
 
 $(function () {
+  const timeElapsed = Date.now();
+  const today = new Date(timeElapsed);
+
+  $('#changeDate').datepicker({
+    uiLibrary: 'bootstrap4',
+    value: today.toLocaleDateString(),
+  });
+
+
   $(document).on('click', '.pagination a', function(event) {
     event.preventDefault();
     var hrefPage = $(this).attr('href');
