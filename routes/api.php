@@ -41,12 +41,14 @@ Route::group(['middleware' => ['json.response'],'namespace' => 'Api'], function 
 
         /** Product */
         Route::resource('products', 'ProductController')->except(['edit', 'store', 'create', 'update', 'destroy']);
+        Route::get('images/product/{productId}', 'ProductController@getProductImage');
 
         /** Orders */
         Route::resource('orders', 'OrderController')->except([
             'edit', 'create'
         ]);
         Route::get('wait/orders', 'OrderController@getOrderWait');
+        Route::get('find/orders', 'OrderController@getOrderByParam');
 
 
         Route::get('/information/complaints', 'InformationController@getComplaintInfo');

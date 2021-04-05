@@ -1,7 +1,8 @@
 @extends('layouts.backend')
 
 @section('baseStyles')
-  <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.2/css/rowGroup.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/rowgroup/1.1.2/css/rowGroup.dataTables.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/css/gijgo.min.css" integrity="sha512-oCuecFHHGu/Y4zKF8IoSoj5hQq1dLNIiUCwN08ChNW1VoMcjIIirAJT2JmKlYde6DeLN6JRSgntz6EDYDdFhCg==" crossorigin="anonymous" />
 @endsection
 
 @section('content')
@@ -18,10 +19,41 @@
           <div class="card-body p-1">
             
             <div class="row m-2">
-              <div class="col-md-6">
-                <button type="button" class="btn btn-success btn-sm" onclick="refreshDatatable()">
-                  <i class="fa fa-spinner"></i> Refresh
-                </button>
+              <div class="col-md-8">
+
+                <div class="form-group row">
+                  <label for="changeOrderDate" class="col-md-3 m-2">
+                    Tanggal Pemesanan
+                  </label>
+                  <div class="col-md-8">
+                    <input id="changeOrderDate"  class="form-control" />
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <label for="selectStatusOrder" class="col-md-3 m-2">
+                    Status Pemesanan
+                  </label>
+                  <div class="col-md-8">
+                    <select id="selectStatusOrder" name="selectStatusOrder" class="form-control form-control-sm">
+                      <option value="wait">Menunggu</option>
+                      <option value="accept">Terima</option>
+                      <option value="cancel">Tolak</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group row">
+                  <div class="col-md-8 offset-md-4 m-2">
+                    <button type="button" class="btn btn-primary btn-sm" onclick="filterDatatable()">
+                      <i class="fa fa-filter"></i> Filter
+                    </button>
+
+                    <button type="button" class="btn btn-success btn-sm" onclick="refreshDatatable()">
+                      <i class="fa fa-spinner"></i> Refresh
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -46,8 +78,10 @@
 @push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 <script src="https://cdn.datatables.net/rowgroup/1.1.2/js/dataTables.rowGroup.min.js"></script>
-<script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/js/gijgo.min.js" integrity="sha512-T62eI76S3z2X8q+QaoTTn7FdKOVGjzKPjKNHw+vdAGQdcDMbxZUAKwRcGCPt0vtSbRuxNWr/BccUKYJo634ygQ==" crossorigin="anonymous"></script>
 
+<script>
+  
 var thisTable = 'orderTable';
 var urlApi = "{{ url('orders') }}";
 
@@ -67,14 +101,13 @@ function setDatatable(tableName , filter = null) {
     ajax: {
       "url": "{{ route('list.orders') }}",
       "data": function (d) {
-        console.log("Filter", filter);
-
         if(filter == null) {
-          d.isAgree = false;
           d.orderDate = null;
+          d.orderStatus = null;
         }
         else {            
-          d = filter;
+          d.orderDate = filter.orderDate;
+          d.orderStatus = filter.orderStatus
         }
       }   
     },
@@ -170,10 +203,12 @@ function setAgree(id) {
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
-    confirmButtonText: 'Ya, Hapus!'
+    confirmButtonText: 'Ya!'
   }).then((result) => {
     if (result.isConfirmed) {
-      axios.delete(url).then((response) => {
+      axios.get(url).then((response) => {
+        console.log("Response", response);
+        
         const {data, status} = response;
         if(status == 200) {
           Swal.fire({
@@ -202,8 +237,28 @@ function refreshDatatable() {
   setDatatable(thisTable);
 }
 
+function filterDatatable() {
+  const filter = {
+    orderDate: $('#changeOrderDate').val(),
+    orderStatus: $("#selectStatusOrder").val()
+  }
+  setDatatable(thisTable, filter);
+}
+
 $(function () {
-  setDatatable(thisTable);
+
+  const timeElapsed = Date.now();
+  const today = new Date(timeElapsed);
+
+  $('#changeOrderDate').datepicker({
+    uiLibrary: 'bootstrap4',
+    value: today.toLocaleDateString(),
+  });
+
+  setDatatable(thisTable, {
+    orderDate: $('#changeOrderDate').val(),
+    orderStatus: $("#selectStatusOrder").val()
+  });
 
   $("#btnSaveReason").click(function (e) { 
     e.preventDefault();
@@ -212,8 +267,6 @@ $(function () {
       orderId: $(this).attr('data-id')
     };
     
-    console.log("Orders", orders);
-
     axios.post(urlApi + '/disagree', orders).then((response) => {
       const {data, status} = response;
       if(status == 200) {

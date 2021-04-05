@@ -152,7 +152,6 @@
 
         if(status == 200) {
           readCartCount(data.totalOrder)
-          localStorage.setItem('totalOrder', data.totalOrder);
         }
       } catch (error) {
         console.log(error.response);
@@ -169,7 +168,7 @@
       let socket = io(CLIENT_SOCKET_HOST + ":" + CLIENT_SOCKET_PORT);
 
       initNotification(authUser.id)
-      cartCount();
+      cartCount()
 
       socket.on('connect', () => {
         socket.emit('sendUserLogin', authUser.id);
@@ -240,46 +239,25 @@
       /** Order Socket Channel */
       socket.on(globalBroadcast.event.cartOrder.channelName.add + ":" +  globalBroadcast.event.cartOrder.eventName, (message) => {
         console.log(`${globalBroadcast.event.cartOrder.channelName.add}`, message);
-        const {receivers} = message;
-
-        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(
-          localStorage.getItem('totalOrder')
-        ) : 0;
-
         if(userRole.slug == receivers) {
-          totalOrder = totalOrder + 1
-          localStorage.setItem('totalOrder', totalOrder);
-          readCartCount(totalOrder)
+          cartCount()
         }
       });
 
       /** Agree Order Socket Channel */
       socket.on(globalBroadcast.event.cartOrder.channelName.agree + ":" + globalBroadcast.event.cartOrder.eventName, (message) => {
         console.log(`${globalBroadcast.event.cartOrder.channelName.agree}`, message);
-        const {receivers} = message;
-        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(
-          localStorage.getItem('totalOrder')
-        ) : 0;
-
-        if(receivers == authUser.id) {
-          totalOrder = totalOrder - 1;
-          localStorage.setItem('totalOrder', totalOrder);
-          readCartCount(totalOrder)
+        if(userRole.slug == 'admin') {
+          cartCount()
         }
       });
 
       /** Disagree Order Socket Channel */
       socket.on(globalBroadcast.event.cartOrder.channelName.disagree + ":" + globalBroadcast.event.cartOrder.eventName, (message) => {
-        console.log("MESSAGE", message);
-        const {receivers} = message;
-        let totalOrder = localStorage.getItem('totalOrder') ? parseInt(
-          localStorage.getItem('totalOrder')
-        ) : 0;
-
-        if(receivers == authUser.id) {
-          totalOrder = totalOrder - 1;
-          localStorage.setItem('totalOrder', totalOrder);
-          readCartCount(totalOrder)
+        console.log(`${globalBroadcast.event.cartOrder.channelName.disagree}`, message);
+        
+        if(userRole.slug == 'admin') {
+          cartCount()
         }
       });
 

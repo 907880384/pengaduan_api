@@ -40,12 +40,16 @@
           </div>
 
           <div class="form-group text-right">
-            {{-- <a href="auth-forgot-password.html" class="float-left mt-3">
-              Saya lupa password ?
-            </a> --}}
             <button type="submit" class="btn btn-primary btn-lg btn-icon icon-right" tabindex="4">
               Login
             </button>
+          </div>
+
+          <div class="form-group text-right">
+            <span>Download</span>
+            <a href="{{ url('download/apk') }}" class="align-center">
+              <img src="{{ asset('images/download.png') }}" width="100" height="35" />
+            </a>
           </div>
         </form>
 

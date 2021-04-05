@@ -29,6 +29,32 @@ class OrderController extends Controller
             'agreeter'
         ]);
 
+        $orderDate = $req->query('orderDate');
+        $orderStatus = $req->query('orderStatus');
+
+        if($orderDate && $orderDate != null) {
+            $records = $records->whereDate('order_date', \Carbon\Carbon::parse($orderDate)->format('Y-m-d'));
+        }
+
+        if($orderStatus && $orderStatus != null) {
+            switch (strtolower($orderStatus)) {
+                case 'wait':
+                    $records = $records->where('is_agree', false)->where('is_disagree', false);
+                    break;
+
+                case 'accept': 
+                    $records = $records->where('is_agree', true);
+                    break;
+
+                case 'cancel':
+                    $records = $records->where('is_agree', false)->where('is_disagree', true);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+
         $records->orderBy('order_date', 'desc')->get();
 
         return Datatables::of($records)->addIndexColumn()
@@ -68,6 +94,7 @@ class OrderController extends Controller
     public function countNewOrder() {
         $totalOrder = Order::where('is_agree', false)
         ->where('is_disagree', false)
+        ->whereDate('order_date', \Carbon\Carbon::today())
         ->count();
 
         return response([
@@ -107,7 +134,25 @@ class OrderController extends Controller
     }
 
     public function agreed($id) {
-        
+        $order = Order::find($id);
+        $order->is_agree = true;
+        $order->agree_date = \Carbon\Carbon::now()->toDateTimeString();
+        $order->user_agree_id = Auth::user()->id;
+        $order->save();
+
+        if(!$order) {
+            return response(['message' => 'Persetujuan pesanan barang, tidak dapat diakses'], 400);
+        }
+
+        event(new OrdersCartEvent(
+            $order, 
+            $order->user_id,
+            "AGREE_ORDER"
+        ));
+
+        return response([
+            'message' => 'Pesanan barang disetujui'
+        ], 200);
     }
 
     public function showListCart() {
@@ -122,7 +167,7 @@ class OrderController extends Controller
             'product'
         ])->where('is_agree', false)->where('is_disagree', false);
 
-        if($product_id != '-' && $product_id != '') {
+        if($product_id != 'all') {
             $orders = $orders->where('product_id', $product_id);
         }
 

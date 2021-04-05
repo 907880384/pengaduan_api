@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Session;
 use Validator;
+use Response;
 
 class AuthController extends Controller
 {
@@ -33,5 +34,14 @@ class AuthController extends Controller
         Session::flush();
         Auth::logout();
         return redirect('login');
+    }
+
+    public function downloadAndroidAPK() {
+        $file = public_path()."/downloads/app-debug.apk";
+        $headers = [
+            'Content-Type'=>'application/vnd.android.package-archive',
+            'Content-Disposition'=> 'attachment; filename="android.apk"',
+        ];
+        return Response::download($file, 'app-debug.apk',$headers);
     }
 }

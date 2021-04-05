@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cookie;
 use App\Models\Product;
+use App\Models\ProductFile;
 use Helper;
 use Auth;
 
@@ -68,6 +69,9 @@ class ProductController extends Controller
 
     }
 
-    
+    public function getProductImage($productId) {
+        $productFiles = ProductFile::where('product_id', $productId)->get();
+        return response(['product_files' => $productFiles],200);
+    }
 
 }

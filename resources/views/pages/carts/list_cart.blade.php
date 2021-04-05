@@ -42,7 +42,7 @@
 
                         <p>Nama Barang</p> 
                         <select id="selectProductOption">
-                          <option value="-">Semuanya</option>
+                          <option value="all">Semuanya</option>
                           @foreach ($products as $product)
                             <option value="{{ $product->product_id }}">
                               {{ $product->product_name }}
@@ -67,7 +67,9 @@
 
     </div>
   </div>
-</section>  
+</section>
+
+@include('pages.orders.model_disagree')
 @endsection
 
 @push('scripts')
@@ -75,6 +77,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gijgo/1.9.13/combined/js/gijgo.min.js" integrity="sha512-T62eI76S3z2X8q+QaoTTn7FdKOVGjzKPjKNHw+vdAGQdcDMbxZUAKwRcGCPt0vtSbRuxNWr/BccUKYJo634ygQ==" crossorigin="anonymous"></script>
 <script>
 
+const urlOrders = "{{ url('orders') }}";
 const urlApi = "{!! url('/list/cart/orders') !!}"
 
 function setDatatable(page) {
@@ -99,15 +102,50 @@ function filterCarts() {
   }
   
   setDatatable(page);
+  
 }
 
 
 function setAgree(id) {
-  console.log(id);
+  
+  const url = urlOrders + "/agreed/" + id 
+    
+  Swal.fire({
+    title: 'KONFIRMASI',
+    text: 'Saya menyetujui permintaan pesanan barang ini',
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Ya!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      axios.get(url).then((response) => {
+        console.log("Response", response);
+        
+        const {data, status} = response;
+        if(status == 200) {
+          Swal.fire({
+            title: 'SUCCESS',
+            text: data.message,
+            confirmButtonText: `OK`,
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.reload()
+              //window.location.href = urlApi
+            }
+          })
+        }
+      }).catch((error) => {
+        console.log(error.response);
+      });
+    }
+  })
 }
 
 function setDisagree(id) {
-  
+  $("#modalDisagree").modal('show');
+  $("#btnSaveReason").attr('data-id', id);
 }
 
 
@@ -118,6 +156,43 @@ $(function () {
   $('#changeDate').datepicker({
     uiLibrary: 'bootstrap4',
     value: today.toLocaleDateString(),
+  });
+
+
+  $("#btnSaveReason").click(function (e) { 
+    e.preventDefault();
+    const orders = {
+      orderReason: $("#reasonCancel").val(),
+      orderId: $(this).attr('data-id')
+    };
+    
+    axios.post(urlOrders + '/disagree', orders).then((response) => {
+      const {data, status} = response;
+      if(status == 200) {
+        Swal.fire({
+          title: 'KONFIRMASI',
+          text: data.message,
+          icon: 'success',
+          confirmButtonText: `OK`,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href = urlApi
+          }
+        })
+      }
+    }).catch((err) => {
+      const {data} = err.response;
+      Swal.fire({
+        title: 'ERROR',
+        text: data.message,
+        icon: 'error',
+        confirmButtonText: `OK`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+        }
+      })
+    });
+    
   });
 
 
