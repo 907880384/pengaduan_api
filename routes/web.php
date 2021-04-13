@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', 'Web\AuthController@login');
 Route::get('login', 'Web\AuthController@login')->name('login');
-Route::post('login', 'Web\AuthController@authLogin')->name('login');
+Route::post('login', 'Web\AuthController@authLogin')->name('postLogin');
 Route::get('download/apk', 'Web\AuthController@downloadAndroidAPK');
 
 Route::group(['middleware' => ['auth']], function () {

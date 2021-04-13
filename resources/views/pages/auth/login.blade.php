@@ -8,7 +8,7 @@
         <img src="../assets/img/complaint.png" alt="logo" width="80" class="shadow-light rounded-circle mb-5 mt-2">
         <h4 class="text-dark font-weight-normal">{{ config('app.name', 'Pengaduan App') }}</span></h4>
         <p class="text-muted">Silahkan login dengan akun anda</p>
-        <form method="POST" action="{{ route('login') }}" class="needs-validation" novalidate="">
+        <form method="POST" action="{{ route('postLogin') }}" class="needs-validation" novalidate="">
           @csrf
           <div class="form-group">
             <label for="email">NIP/Username</label>
