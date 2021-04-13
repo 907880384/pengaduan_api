@@ -9,7 +9,7 @@ Route::get('download/apk', 'Web\AuthController@downloadAndroidAPK');
 
 Route::group(['middleware' => ['auth']], function () {
     Route::get('/', 'Web\DashboardController@index')->name('dashboard');
-    Route::get('dashboard', 'Web\DashboardController@index')->name('dashboard');
+    Route::get('dashboard', 'Web\DashboardController@index');
 
     Route::get('logout', 'Web\AuthController@logout')->name('logout');
 
